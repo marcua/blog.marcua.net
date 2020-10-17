@@ -1,1 +1,1 @@
-# blog.marcua.net
+marcua's blog (implemented in Gatsby, originally copied from [gatsby-starter-blog](https://github.com/gatsbyjs/gatsby-starter-blog)).
