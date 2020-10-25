@@ -19,7 +19,7 @@ Human-powered sorts are everywhere. &nbsp;When you submit a product review with 
 
 The two sort-input methods can be found in the image below. &nbsp;On the left, users compare five squares by size. &nbsp;On the right, users rate each square on a scale from one to seven by size after seeing 10 random examples.
 
-[![Comparison- and Rating-based Sort](http://db.csail.mit.edu/qurk/comparison-rating.png)](http://db.csail.mit.edu/qurk/comparison-rating.png)
+[![Comparison- and Rating-based Sort](https://db.csail.mit.edu/qurk/comparison-rating.png)](https://db.csail.mit.edu/qurk/comparison-rating.png)
 
 In our paper, we show that&nbsp;comparisons provide accurate rankings, but are expensive: they require a number of comparisons quadratic in the number of items being compared. &nbsp;Rating is quite accurate, and cheaper than sorts: it’s linear in the number of items rated. &nbsp;We also propose a hybrid of the two that balances cost and accuracy, where we first rate all items, and then compare items with similar ratings.
 
@@ -35,7 +35,7 @@ Human-powered Joins are equally pervasive. &nbsp;The area of [Entity Resolution]
 
 We explored three interfaces for solving the celebrity matching problem (and more broadly, the human-powered entity resolution problem). &nbsp;The first is a simple join interface, asking users if the same celebrity is displayed in two images. &nbsp;The second employs batching, asking Turkers to match several pairs of celebrity images. &nbsp;The third interface employs more complex batching by asking Turkers to match celebrities arrayed in two columns.
 
-[![Simple Joins, Naive Batching, and Smart Batching](http://db.csail.mit.edu/qurk/simple-naive-smart.png)](http://db.csail.mit.edu/qurk/simple-naive-smart.png)
+[![Simple Joins, Naive Batching, and Smart Batching](https://db.csail.mit.edu/qurk/simple-naive-smart.png)](https://db.csail.mit.edu/qurk/simple-naive-smart.png)
 
 As we batch more pairs to match per task, cost goes down, but so does Turker accuracy. &nbsp;Still, we found that we can achieve around a 10x cost reduction without significantly losing in result quality. &nbsp;We can achieve even more savings by having workers identify features of the celebrities, so that we don’t, for example, try to match up males with females.
 
