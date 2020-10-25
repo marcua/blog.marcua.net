@@ -40,8 +40,8 @@ minima:
   social_links:
     twitter: marcua
     github: marcua
-show_excerpts: true
-google_analytics: UA-2529786-1
+show_excerpts: false
+google_analytics: UA-8267962-1
 
 # Exclude from processing.
 # The following items will not be processed, by default.
