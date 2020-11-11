@@ -3,14 +3,18 @@ layout: post
 title: 'Autodata: Automating common data operations'
 ---
 
-Alright.  I've directly made a bunch of suggestions and edits as stream of consciousness as I read through.  Main points:
+Summary of points.
 
-* Beginning could be tighter,
+* Agree with peter: 
+  * Move the lead up, make explicit.  Paint the "ideal" of what autodata would mean/change.
+  * Organize steps by problem, current solutions (can contrast with the ideal)
 * list of needs is good (could have a bit more categorization)
-* Autodata of what? To what end?  I think you should make that clear and pick a class of tasks.  Scorpion/Sisu for instance don't have much to do with building models (though they could be extended towards that).  Dabl is specifically about models.  
-* Gu's suggestion of replacing Autodata x.0 --> semantically meaningful signifier is good.
+* Make clear what is being "autodata"ed. Is it model building?  Or every possible data task?
+  * e.g., Scorpion/Sisu don't have much to do with building models directly; dabl does
+  * Will help scope the types of projects to point out
+* Suggested organization of future steps in that section.
 
-Misc Comments start:
+The rest of comments are written as I read:
 
 * This image from Jeff's Visualization Is Not Enough talk may help set the stage
   * <img src="https://eagereyes.org/wp-content/uploads/2019/09/58C5C099-48C7-4E5B-B5FA-F9E0EAFDCCBE.jpeg"/>
@@ -78,13 +82,21 @@ A project like [scikit-learn](https://scikit-learn.org/stable/) offers so many m
 
 
 
-## Looking Forward
+## Looking Forward And How To Get There
 
-* You'll want to define up front what autodata is supposed to mean!
-* Rephares "What could the future look like" as "What are the steps towards autodata"?
+* "What could the future look like" --> "What are the steps towards autodata"?
+* I think of this as moving up levels of abstraction.  Given that the goal is a data pipeline that is "perfect",
+  we want to move up in abstraction for constructing/maintaining such a pipeline:
+  1. Manual bit twiddling and low level tasks (changing representations, encoding)
+  2. automate parts of individual rote tasks where automation is good enough (hyper param, encoding, feature seelction, etc)
+  3. eliminate entire tasks
+  4. instead of manually building a pipeline to meet your objective, state and tune the objective directly.
+    * the data programming stuff (overton) is towards that
+    * Sisu/Scorpion are that for data analysis
+* What are the problems that remain unsolved?  Paint the implications once Autodata 100.0 is upon us!
+* Gu's suggestion of replacing Autodata x.0 --> semantically meaningful signifiers is good.
 
 I'm sure I've missed a number of projects in the space, as well as entire categories in the space. If anyone wanted to collaborate on a deeper survey, I'd be game. Autodata is in its infancy: most of the projects listed above aren't yet at 1.0 versions.  What could the future of Autodata look like?
-
 
 * Autodata 0.0: Today, many of these projects exist, but aren't data practitioners' go-to tools. While dabblers will dabble, most practitioners will still rely on primitives like `pandas` or `scikit-learn` to make progress.
 * Autodata 1.0: As the tools, documentation, and examples solidify over the coming years, practitioners will begin using packages like the ones in this post in production to ingest, understand, and model their data.
