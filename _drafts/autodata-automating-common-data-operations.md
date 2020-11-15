@@ -10,9 +10,10 @@ Luckily, the data community has been making a lot of common operations less arca
 
 To be clear, Autodata doesn't replace critical thinking: it just means that in fewer lines of code, a data practitioner can follow a best practice. Fully realized, an Autodata workflow will break a high-level goal like "I want to predict X" or "I want to know why Y is so high" into a set of declarative steps (e.g., "Summarize the data," "Build the model") that require little or no code to run, but still allow for introspection and iteration.
 
-In this post, I'll highlight a few trailblazing projects in the space, categorized by stage in the data analysis pipeline. I'm sure I've missed a number of projects in the space, as well as entire categories in the space. This area deserves a deeper survey: I'd love to collaborate with folks that agree!
+In this post, I'll first list projects in the space of Autodata, and then take a stab at what the future of Autodata could look like.
 
 # The problems and projects
+Here are a few trailblazing projects in the space, categorized by stage in the data analysis pipeline. I'm sure I've missed a number of projects in the space, as well as entire categories in the space. This area deserves a deeper survey: I'd love to collaborate with folks that agree!
 
 ## Data ingestion
 You can't summarize or analyze your data in its raw form: you have to turn it into a dataframe or SQL-queriable table. When presented with a new CSV file or collection of JSON blobs, my first reaction is to load the data into some structured data store. Most datasets are small, and many analyses start locally, so I try loading the data into a [SQLite](https://www.sqlite.org/index.html) or [DuckDB](https://duckdb.org/) embedded database. This is almost always harder than it should be: the CSV file will have inconsistent string/numeric types and null values, and the JSON documents will pose additional problems around missing fields and nesting that prevents their loading into a relational database. The problem of loading a new dataset is the problem of describing and fitting it to a schema.
@@ -46,7 +47,7 @@ There are solutions (not all of them open source just yet) for each of these pro
 
 Whereas the open source world has good answers to repeatable data transformation and data testing, I haven't been able to find open source tools to track and make repeatable all of the conditions that let to a trained model. [Weights & Biases](https://www.wandb.com/) and [CometML](https://www.comet.ml/) offer products in this space, and I hope that open source competitors arise.
 
-# Where to go from here
+# The future of Autodata
 
 Autodata is in its infancy: most of the projects listed above aren't yet at 1.0 versions.  What could the future of Autodata look like?
 * Autodata 0.0: Today, many of these projects exist, but aren't data practitioners' go-to tools. While dabblers will dabble, most practitioners will still rely on primitives like `pandas` or `scikit-learn` to make progress.
