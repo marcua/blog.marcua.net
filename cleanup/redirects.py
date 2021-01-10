@@ -27,7 +27,13 @@ def clean_redirects(filename):
 def main():
     for subdir, dirs, files in os.walk('post'):
         for file in files:
-            clean_redirects(os.path.join(subdir, file))
+            # Weird commented-out code is because I had to clean this
+            # up across commits as I found issues with broken links in
+            # serch engines.            
+            # Step 1: Clean up from original tumblr extract
+            # clean_redirects(os.path.join(subdir, file))
+            # add_redirect(os.path.join(subdir, file))
+            print(subdir, dirs, file)
 
 if __name__ == '__main__':
     main()
