@@ -1,0 +1,55 @@
+---
+layout: post
+title: 2019 Book list
+tags: book-list
+---
+
+In 2019, I reconnected with books. This is largely thanks to
+[Libby](https://help.libbyapp.com/en-us/6103.htm), the app that made
+it easy to check out and read books, and the [New York Public
+Library](https://www.nypl.org/library-card), from which I got a free
+card.
+
+I did a mix of reading and listening to books, largely listening to
+one while I ran and did chores, and reading one at night and on
+weekends. Libby/your library probably give you access to a bunch of
+e-books and audiobooks, so give both a shot!
+
+Here are the books I read or listened to in 2019 in the order that I
+consumed them. After a few warmup/fun books, I started reading books
+from the [Pulitzer prize
+list](https://www.pulitzer.org/prize-winners-categories) for previous
+years in a bunch of the book subcategories, as well as recommendations
+from friends.
+
+* Remote: Office Not Required by Jason Fried and David Heinemeier Hansson
+* Between the World and Me by Ta-Nehisi Coates
+* Night by Elie Wiesel
+* Never Lose a Customer Again by Joey Coleman
+* The Hunger Games by Suzanne Collins
+* Catching Fire (Hunger Games 2) by Suzanne Collins
+* Mockingjay (Hunger Games 3)  by Suzanne Collins
+* Traction: How a startup can achieve explosive customer growth by Gabriel Weinberg and Justin Mares
+* Blood in the water: The Attica prison uprising of 1971 and its legacy by Heather Ann Thompson
+* Evicted: Poverty and profit in the American city by Matthew Desmond
+* The underground railroad by Colson Whitehead
+* Hamilton: The revolution by Jeremy McCarter and Lin-Manuel Miranda
+* It Doesn't Have to be Crazy at Work by David Heinemeier Hansson and Jason Fried
+* The Blood telegram: Nixon, Kissinger, and a forgotten genocide by Gary J. Bass
+* Hillbilly Elegy: A memory of a family and culture in crisis by J. D. Vance
+* Locked In: The true causes of mass incarceration and how to achieve real reform by John Pfaff
+* The Well-tempered City by Jonathan F. P. Rose
+* Black Flags: The rise of ISIS by Joby Warrick
+* The Triple Agent by Joby Warrick
+* The Dark Side: The Inside Story of How the War on Terror Turned Into a War on American Ideals by Jane Mayer
+* The Lowland by Jhumpa Lahiri
+* The Line Becomes a River by Francisco Cantú
+* Toms River: A Story of Science and Salvation by Dan Fagin
+* Ghost Work: How to stop silicon valley from building a new global underclass by Mary L. Gray and Siddharth Suri
+* Strangers drowning: Grappling with Impossible Idealism, Drastic Choices, and the Overpowering Urge to Help by Larissa MacFarquhar
+* All the Light we Cannot See by Anthony Doerr
+* We Fed an Island by José Andrés with Richard Wolffe
+* Sapiens: A brief history of humankind by Yuval Noah Harari
+* Less by Andrew Sean Greer
+* Amity and Prosperity: one family and the fracturing of America by Eliza Griswold
+* Ghost Wars: the secret history of the CIA Afghanistan, and Bin Laden, from the Soviet invasion to September 10, 2001
