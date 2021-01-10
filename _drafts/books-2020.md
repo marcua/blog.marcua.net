@@ -1,0 +1,32 @@
+---
+layout: post
+title: 2020 Book list
+tags: book-list
+---
+
+In 2020, I spent more time doomscrolling and less time
+reading/listening to books. I continued the [2019 approach of reading
+from the Pulitzer Prize list]({% posturl books-2019 %}) and got some
+excellent recommendations from friends, as well!
+
+Here are the books I read or listened to in 2020 in the order that I
+consumed them:
+
+* Why We Sleep: Unlocking the power of sleep and dreams by Matthew Walker
+* Directorate S: The C.I.A. and America's Secret Wars in Afghanistan and Pakistan by Steve Coll
+* The Death and Life of Great American Cities by Jane Jacobs
+* The Girl with the Dragon Tattoo by Stieg Larsson
+* Spies of no Country: Secret lives at the birth of Israel by Matti Friedman
+* Never Split the Difference by Chris Voss
+* How the Other Half Banks by Mehrsa Baradaran
+* The Color of Money: Black banks and the racial wealth gap by Mehrsa Baradaran
+* The Looming Tower: Al-Qaeda and the road to 9/11 by Lawrence Wright
+* The Mastermind by Evan Ratliff
+* The Power Broker: Robert Moses and the Fall of New York by Robert A. Caro
+* Sandworm: A New Era of Cyberwar and the Hunt for the Kremlin's Most Dangerous Hackers by Andy Greenberg
+* American Gods: A novel by Neil Gaiman
+* The Devil's Highway: A true story by Luis Alberto Urrea
+* Why nations fail: The origins of power, prosperity, and poverty by Daron Acemoglu and James A. Robinson
+* Turing’s Cathedral: The origins of the digital universe by George Dyson
+* Not a book, but it really moved me: seasons 1 and 2 (especially 2) of the In The Dark podcast
+* Private Empire: ExxonMobil and American Power by Steve Coll
