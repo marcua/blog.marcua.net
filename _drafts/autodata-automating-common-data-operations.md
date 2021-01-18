@@ -6,11 +6,11 @@ title: 'Autodata: Automating common data operations'
 
 Much of the work a data scientist or engineer performs today is rote and error-prone. Data practitioners have to perform tens of steps in order to believe their own analyses and models. The process for each step involves modifications to hundreds/thousands of lines of code copied from previous projects, making it easy to forget to tweak a parameter or default. Worse yet, because of the many dependent steps involved in a data workflow, errors compound. It's no surprise that even after checking off every item of a good data practices checklist, the data practitioner doesn't fully trust their own work.
 
-Luckily, the data community has been making a lot of common operations less arcane and more repeatable. The community has been automating common procedures including data loading, exploratory data analysis, feature engineering, and model-building. This new world of *Autodata* removes some agency from data practitioners in exchange for repeatability and a reduction in repetitive error-prone work. Realized fully
+Luckily, the data community has been making a lot of common operations less arcane and more repeatable. The community has been automating common procedures including data loading, exploratory data analysis, feature engineering, and model-building. This new world of *autodata* removes some agency from data practitioners in exchange for repeatability and a reduction in repetitive error-prone work. Realized fully
 
-To be clear, Autodata doesn't replace critical thinking: it just means that in fewer lines of code, a data practitioner can follow a best practice. Fully realized, an Autodata workflow will break a high-level goal like "I want to predict X" or "I want to know why Y is so high" into a set of declarative steps (e.g., "Summarize the data," "Build the model") that require little or no code to run, but still allow for introspection and iteration.
+To be clear, autodata doesn't replace critical thinking: it just means that in fewer lines of code, a data practitioner can follow a best practice. Fully realized, an autodata workflow will break a high-level goal like "I want to predict X" or "I want to know why Y is so high" into a set of declarative steps (e.g., "Summarize the data," "Build the model") that require little or no code to run, but still allow for introspection and iteration.
 
-In this post, I'll first list projects in the space of Autodata, and then take a stab at what the future of Autodata could look like.
+In this post, I'll first list projects in the space of autodata, and then take a stab at what the future of autodata could look like.
 
 ## Problems and projects
 Here are a few trailblazing projects in the space, categorized by stage in the data analysis pipeline. I'm sure I've missed a number of projects in the space, as well as entire categories in the space. This area deserves a deeper survey: I'd love to collaborate with folks that agree!
@@ -47,22 +47,33 @@ There are solutions (not all of them open source just yet) for each of these pro
 
 Whereas the open source world has good answers to repeatable data transformation and data testing, I haven't been able to find open source tools to track and make repeatable all of the conditions that let to a trained model. [Weights & Biases](https://www.wandb.com/) and [CometML](https://www.comet.ml/) offer products in this space, and I hope that open source competitors arise.
 
-## The future of Autodata
+## The future of autodata
 
-Autodata is in its infancy: most of the projects listed above aren't yet at 1.0 versions.  What could the future of Autodata look like?
-* Autodata 0.0: Today, many of these projects exist, but aren't data practitioners' go-to tools. While dabblers will dabble, most practitioners will still rely on primitives like `pandas` or `scikit-learn` to make progress.
-* Autodata 1.0: As the tools, documentation, and examples solidify over the coming years, practitioners will begin using packages like the ones in this post in production to ingest, understand, and model their data.
-* Autodata 2.0: More connective tissue between these projects will remove the need for entire steps in the data pipeline. If `sqlite-utils` used a state-of-the-art schema detection library, "define the schema and load my data" might simply turn into "load my data." Similarly, if AutoML projects relied on best-of-class automatic feature engineering libraries, feature engineering as an explicit step might be eliminated in some cases.
-* Autodata 3.0: So far, the automation I've described has been around removing rote work in the traditional data practitioner's workflow. It doesn't, however, actually answer questions you might have about the data. Future automation can help us answer higher-level questions that arise every day in an organization. For example, work like [Scorpion](http://www.vldb.org/pvldb/vol6/p553-wu.pdf) and [Sisu](https://sisudata.com/product/) answer the question "what might have caused this variable to change?" With Autodata 3.0, it would be great to see open source packages that help answer high-level questions like these with as little code as possible.
+Autodata is in its infancy: many of the projects listed above aren't yet at 1.0 versions.  What could the future of autodata look like? Here are a few phases we might encounter:
 
+### Primitives and prototypes
+Today, many of these projects exist, but aren't data practitioners' go-to tools. The tools that do exist focus on primitives: a successful project looks at a single part of the data pipeline like schema inference or hyperparameter selection and shows that it can be automated without loss of performance/accuracy. As dabblers dabble and explore these tools, practitioners will still rely on their existing pipelines, but plug a promising project into their data pipeline to save time in one area of their work.
+
+### Maturation and integration
+As the automatable primitives are ironed out, more of the projects will be strung together to form reusable autodata pipelines. If `sqlite-utils` used a state-of-the-art schema detection library, "define the schema and load my data" might simply turn into "load my data." Similarly, if AutoML projects relied on best-of-class automatic feature engineering libraries, feature engineering as an explicit step might be eliminated in some cases.
+
+### Limitations and introspection
+As higher-level abstractions become the subject of autodata, data pipelines will become accessible to a wider audience. This is a double-edged sword: despite the fact that working with data today requires somewhat arcane knowledge, practitioners still misuse models and misunderstand analyses. As autodata will expand the number of people who can create their own data pipelines, communicating the misappropriation of autodata will be critical.
+
+Sociotechnical researcher collaborations in Ethical AI are already sounding the alarm on the hidden costs of blind faith in algorithms. A big research focus in the next phase of autodata will revolve around how to communicate these exceptions and limitations in the software. If a pipeline had to omit 1% of a dataset in order to load the rest, the desire for *auto* ("the data was loaded! forget the details!") will be at odds with the desire for *data* ("the 1% of data you didn't load will cause a systemic bias in the model you build from it!"). If an autodata system selects a more complex model because it improves precision by 5%, how can that same system later warn you that the model has not continued to perform in the face of new data? A few specific areas of technical research will be birthed in this space:
+* Human-computer interaction researchers often invoke the concept of [mixed-initiative interaction](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/11/chi99horvitz-1.pdf) to describe how humans can take turns refining the output of machines. How might we add friction to a pure autodata pipeline so that the operator is aware of the limitations of the "optimal" pipeline? How can the machine take feedback from the operator so the model avoids the operator (or society)'s biggest concerns?
+* Autodata monitoring. How to add the right metadata to learned models so that downstream use cases can raise exceptions when assumptions are broken? What interfaces and modalities will alert the user (or members of society that consume the output of that pipeline)?
+
+### Declarative autodata
+No writeup on data can avoid the word declarative. Once the depdendable wouldn't So far, the automation I've described has been around removing rote work in the traditional data practitioner's workflow. It doesn't, however, actually answer questions you might have about the data. Future automation can help us answer higher-level questions that arise every day in an organization. For example, work like [Scorpion](http://www.vldb.org/pvldb/vol6/p553-wu.pdf) and [Sisu](https://sisudata.com/product/) answer the question "what might have caused this variable to change?" With Autodata 3.0, it would be great to see open source packages that help answer high-level questions like these with as little code as possible.
+
+Declarativity challenge problems
 
 *Thank you to Peter Bailis, Lydia Gu, and Eugene Wu for their suggestions on improving a draft of this post. The first version they read was an unstructured mess of ideas, and they added structure, clarity, and a few missing reference. I'm particularly grateful for the level of detail of their feedback: I wasn't expecting so much care from such busy people!*
 
 
 
 # Bits and pieces
-
-
 
 . Finally, as you build models, you have to be careful to separate out testing and validation sets, ensure your model isn't more complex than the dataset allows, monitor a collection of scores to identify your most predictive model while also vetting your model hasn't gotten so large that it won't perform in production.
 
