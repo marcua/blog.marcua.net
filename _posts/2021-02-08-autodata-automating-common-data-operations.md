@@ -9,7 +9,7 @@ Much of the work a data scientist or engineer performs today is rote and error-p
 
 Luckily, the data community has been making a lot of common operations less arcane and more repeatable. The community has been automating common procedures including data loading, exploratory data analysis, feature engineering, and model-building. This new world of *autodata* tools takes some agency away from practitioners in exchange for repeatability and a reduction in repetitive error-prone work. Autodata tools, when used responsibly, can standardize data workflows, improve the quality of models and reports, and save practitioners time. 
 
-To be clear, autodata doesn't replace critical thinking: it just means that in fewer lines of code, a data practitioner can follow a best practice. Fully realized, an autodata workflow will break a high-level goal like "I want to predict X" or "I want to know why Y is so high" into a set of declarative steps (e.g., "Summarize the data," "Build the model") that require little or no custom code to run, but still allow for introspection and iteration.
+Autodata doesn't replace critical thinking: it just means that in fewer lines of code, a data practitioner can follow a best practices. Fully realized, an autodata workflow will break a high-level goal like "I want to predict X" or "I want to know why Y is so high" into a set of declarative steps (e.g., "Summarize the data," "Build the model") that require little or no custom code to run, but still allow for introspection and iteration.
 
 In this post, I'll first list some open source projects in the space of autodata, and then take a stab at what the future of autodata could look like. There's no reason to trust the second part, but it might be fun to read nonetheless.
 
