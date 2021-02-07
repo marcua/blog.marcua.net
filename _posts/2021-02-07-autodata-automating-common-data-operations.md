@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Autodata: Automating common data operations'
-date: 2021-02-08 00:00 +0000
+date: 2021-02-07 00:00 +0000
 ---
 ## Introduction
 
