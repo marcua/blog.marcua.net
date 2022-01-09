@@ -1,7 +1,7 @@
 ---
 layout: post
 title: How to archive a website that's shutting down soon
-date: 2022-01-09
+date: 2022-01-09 00:00 +0000
 ---
 
 ## Preserving a piece of digital history
