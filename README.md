@@ -10,5 +10,5 @@
 `jekyll compose "My New Thing" --collection "things"`
 
 # Preview
-`jekyll serve --drafts --future --host 0.0.0.0 --port 8000`
+`timeout 2h jekyll serve --drafts --future --host 0.0.0.0 --port 8000`
 
