@@ -31,7 +31,7 @@ Scorpion has two nice properties. First, it operates on aggregates: it's not unt
 
 The challenge in implementing Scorpion is that, as presented, it does its processing outside of the database that stores the data. Specifically, the way Scorpion partitions and merges subsets of the data to identify an explanation requires decision trees and clustering algorithms that traditionally execute outside of the database[^madlib]. It also is specific to aggregates, which while commonly the source of "why" questions, aren't the only form of that question.
 
-This is where [DIFF](http://www.bailis.org/papers/diff-vldb2019.pdf) comes in. In 2019, Firas Abuzaid, Peter Kraft, Sahaana Suri, Edward Gan, Eric Xu, Atul Shenoy, Asvin Ananthanarayan, John Sheu, Erik Meijer, Xi Wu, Jeff Naughton, Peter Bailis, and Matei Zaharia introduced an explanation algorithm in the form of a database operator called DIFF that can be expressed in SQL. If you're so inclined, here's the syntax for the DIFF operator:
+This is where [DIFF](http://www.bailis.org/papers/diff-vldb2019.pdf) comes in[^related]. In 2019, Firas Abuzaid, Peter Kraft, Sahaana Suri, Edward Gan, Eric Xu, Atul Shenoy, Asvin Ananthanarayan, John Sheu, Erik Meijer, Xi Wu, Jeff Naughton, Peter Bailis, and Matei Zaharia introduced an explanation algorithm in the form of a database operator called DIFF that can be expressed in SQL. If you're so inclined, here's the syntax for the DIFF operator:
 
 | ![The syntax for the DIFF operator ](/assets/images/diff/diff-figure1.png) |
 |:--:|
@@ -151,5 +151,7 @@ Eugene Wu, Sam Madden, Peter Bailis
 ## Footnotes
 
 [^madlib]: Strictly speaking, it doesn't have to be the case that more complex analytics or machine learning algorithms have to be run outside the database. [MADlib](http://vldb.org/pvldb/vol5/p1700_joehellerstein_vldb2012.pdf) speaks to this nicely, although in practice the approach hasn't taken off as widely as I wish it did.
+
+[^related]: It's worth noting that I'm not setting out to write a literature review on explanation algorithms. Several other papers from researchers at the University of Washington and University of Massachusetts, to name a few, have also shaped the field.
 
 [^datools-example]: As an example, not every database (I'm looking at you, SQLite and Redshift) supports things like grouping sets and data cubes, but these operators are critical for making stuff like DIFF-in-SQL work effectively. `datools` has functionality that, if a database supports grouping sets, will use the native functionality, but if the database doesn't, [will do the next best thing](https://github.com/marcua/datools/blob/dc6e6f3b9cad04197872b0e6c6a6288f87e149ca/datools/sqlalchemy_utils.py#L46).
