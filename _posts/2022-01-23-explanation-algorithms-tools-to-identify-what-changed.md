@@ -17,7 +17,7 @@ You can rephrase lots of different questions in the form of an explanation quest
 
 > It would be nice to have a utility that, given two datasets (e.g., two csv files) that are schema-aligned, returns a report of how they differ from one-another in various ways. The utility could take hints of interesting grouping or aggregate columns, or just randomly explore the pairwise combinations of (grouping, aggregate) and sort them by various measures like largest deviation from their own group/across groups.
 
-At the time of that post, I hadn't yet connected the dots between the desire for such a system and the active work going on in the research world. Thanks to database researchers, that connection now exists! In this post, I'll first cover two approaches to explanation algorithms, and then introduce an open source implementation of one of them in my [datools library](https://github.com/marcua/datools) that I've been working on for a while. 
+At the time of that post, I hadn't yet connected the dots between the desire for such a system and the active work going on in the research world. Thanks to database researchers, that connection now exists! In this post, I'll first cover two approaches to explanation algorithms, and then introduce an open source implementation of one of them in the [datools library](https://github.com/marcua/datools) that I've been working on for a while. 
 
 ## Two ways to ask for explanations
 
