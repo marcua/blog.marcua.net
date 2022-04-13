@@ -99,7 +99,6 @@ Now let's use it!
 from sqlalchemy import create_engine
 from datools.explanations import diff
 from datools.models import Column
-from datools.sqlalchemy_utils import query_results_pretty_print
 
 engine = create_engine('sqlite:///intel-sensor.sqlite')
 
