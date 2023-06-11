@@ -41,6 +41,9 @@ minima:
   social_links:
     twitter: marcua
     github: marcua
+    mastodon:
+      - username: marcua
+        instance: hachyderm.io
 show_excerpts: false
 google_analytics: UA-8267962-1
 tag_page_layout: tag-page
