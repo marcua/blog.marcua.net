@@ -137,4 +137,4 @@ Thank you for reading this far. From here, you can:
 * Create an issue, email me, or reach out on social media to get started (my [contact information is here](https://marcua.net/) and I promise to be welcoming).
 
 ## Thank you
-Thank you to Eugene Wu for reading an early draft of this blog post.
+Thank you to Daniel Haas, Eugene Wu for reading an early draft of this blog post.
