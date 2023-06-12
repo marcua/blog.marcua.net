@@ -5,17 +5,17 @@ date: 2023-06-11 22:45 +0000
 ---
 ## Introduction
 
-Today's databases simultaneously ubiquitous inaccessible to most people. Your own data likely lives thousands of databases at various companies and organizations, but if you wanted to create a database for yourself in which you can store data and share it, you need the skills of both a system administrator and a software engineer. By virtue of the complexity of database management systems (and market forces), your data either lives in other people's databases or outside of a database in text files and CSVs.
+Today's databases ubiquitous, but frustratingly inaccessible to most people. Your own data likely lives in thousands of databases at various companies and organizations, but if you wanted to create a database for yourself in which to store data and share it, you need the skills of both a system administrator and a software engineer. By virtue of the complexity of database management systems (and market forces), your data either lives in other people's databases or outside of a database in text files and spreadsheets.
 
 Three groups of people in particular feel the pain of databases being hard to set up: students that are just getting started, sharers like journalists and scientist who are experts in fields other than hosting databases, and anyone who wants to have sovereignty over their data but isn't sure how to get started. We'll dive into each of these groups more in [students, sharers, and sovereigns](#students-sharers-and-sovereigns).
 
-I've been working on a side project named [ayb](https://github.com/marcua/ayb), which is a relational database management system that makes it easier to to create databases, share them with collaborators, and query them from a web application or the command line. With `ayb`, [all your base can finally belong to you](https://www.youtube.com/watch?v=qItugh-fFgg). What does `ayb` offer?
+I've been working on a project called [ayb](https://github.com/marcua/ayb), which is a relational database management system that makes it easier to to create databases, share them with collaborators, and query them from a web application or the command line. With `ayb`, [all your base can finally belong to you](https://www.youtube.com/watch?v=qItugh-fFgg). What does `ayb` offer?
 * **Popular storage formats as an ejection seat**. `ayb` databases are just SQLite files, and `ayb` relies on SQLite for query processing. SQLite is the most widely used database on the planet, and if you one day decide `ayb` isn't for you, you can walk away with your data in a single file. (I one day hope to support other formats like DuckDB's after its storage format stabilizes.)
 * **Easy registration and database creation**. To borrow a tired analogy, `ayb` is like GitHub for your databases: once you create an account on an `ayb` instance, you can create databases quickly and easily. Soon I hope to add features like authentication and permissions so that you can easily share your databases with particular people (or make them publicly accessible).
 * **Multi-tenancy**. While I'd like to believe `ayb` is easy to get up and running, you shouldn't have to be a system administrator to get started. Each `ayb` instance can serve multiple users' databases, so I imagine that in a classroom or newsroom, one person can get it running and everyone else can live on the same instance. After I work through authentication and permissions, I'll plan on running a public `ayb` instance so people can spin up databases without having to run their own instance. Clustering/distribution is on the roadmap so that eventually, if your instance ever needed to, it could run on multiple nodes.
 * **An HTTP API**. To make it easy to integrate into web applications, `ayb` exposes databases over an HTTP API. Down the line I hope to support other wire protocols (e.g., the PostgreSQL wire protocol) for broader compatibility with existing applications.
 
-As it stands, `ayb` is neither feature complete nor production-ready. Functionality like authentication, permissions, collaboration, isolation, high availability, and transaction support are on the [Roadmap](https://github.com/marcua/ayb#roadmap) but not available today. I've been having a blast working on `ayb` as a hobbyist side project a few hours a week. If you want to collaborate, reach out!
+As it stands, `ayb` is neither feature complete nor production-ready. Functionality like authentication, permissions, collaboration, isolation, high availability, and transaction support are on the [Roadmap](https://github.com/marcua/ayb#roadmap) but not available today. If you want to collaborate, reach out!
 
 In the rest of this article, you can:
 * See `ayb` action in an [end-to-end example](#an-end-to-end-example)
@@ -135,3 +135,6 @@ Thank you for reading this far. From here, you can:
 * Read more about what functionality is coming soon to `ayb` in the [Roadmap](https://github.com/marcua/ayb#roadmap).
 * Make a contribution to the project, starting with the details on [how to contribute](https://github.com/marcua/ayb#contributing).
 * Create an issue, email me, or reach out on social media to get started (my [contact information is here](https://marcua.net/) and I promise to be welcoming).
+
+## Thank you
+Thank you to Eugene Wu for reading an early draft of this blog post.
