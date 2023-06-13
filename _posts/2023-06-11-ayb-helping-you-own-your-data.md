@@ -5,7 +5,7 @@ date: 2023-06-11 22:45 +0000
 ---
 ## Introduction
 
-Today's databases ubiquitous, but frustratingly inaccessible to most people. Your own data likely lives in thousands of databases at various companies and organizations, but if you wanted to create a database for yourself in which to store data and share it, you need the skills of both a system administrator and a software engineer. By virtue of the complexity of database management systems (and market forces), your data either lives in other people's databases or outside of a database in text files and spreadsheets.
+Today's databases are ubiquitous, but frustratingly inaccessible to most people. Your own data likely lives in thousands of databases at various companies and organizations, but if you wanted to create a database for yourself in which to store data and share it, you need the skills of both a system administrator and a software engineer. By virtue of the complexity of database management systems (and market forces), your data either lives in other people's databases or outside of a database in text files and spreadsheets.
 
 Three groups of people in particular feel the pain of databases being hard to set up: students that are just getting started, sharers like journalists and scientist who are experts in fields other than hosting databases, and anyone who wants to have sovereignty over their data but isn't sure how to get started. We'll dive into each of these groups more in [students, sharers, and sovereigns](#students-sharers-and-sovereigns).
 
