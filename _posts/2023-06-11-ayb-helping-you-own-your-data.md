@@ -1,19 +1,19 @@
 ---
 layout: post
-title: 'ayb: Helping you own your data'
+title: 'ayb: A multi-tenant database that helps you own your data'
 date: 2023-06-11 22:45 +0000
 ---
 ## Introduction
 
 Today's databases are ubiquitous, but frustratingly inaccessible to most people. Your own data likely lives in thousands of databases at various companies and organizations, but if you wanted to create a database for yourself in which to store data and share it, you need the skills of both a system administrator and a software engineer. By virtue of the complexity of database management systems (and market forces), your data either lives in other people's databases or outside of a database in text files and spreadsheets.
 
-Three groups of people in particular feel the pain of databases being hard to set up: students that are just getting started, sharers like journalists and scientist who are experts in fields other than hosting databases, and anyone who wants to have sovereignty over their data but isn't sure how to get started. We'll dive into each of these groups more in [students, sharers, and sovereigns](#students-sharers-and-sovereigns).
+To make this concrete, imagine a journalist or student that's looking to create a database around a new dataset and build a visualization they host on a website. Using existing database tools, they have to secure a machine, install Postgres/MySQL, update various configuration settings to allow incoming connections, and create and host a web application to gatekeep the database credentials. Instead, what if our user could: 1) Register for an account on a service provided by their newsroom or school, 2) Issue a `create database` instruction and make their database publicly accessible in read only mode, and 3) Issue SQL from the command line or over HTTP through JavaScript?
 
-I've been working on a project called [ayb](https://github.com/marcua/ayb), which is a relational database management system that makes it easier to to create databases, share them with collaborators, and query them from a web application or the command line. With `ayb`, [all your base can finally belong to you](https://www.youtube.com/watch?v=qItugh-fFgg). What does `ayb` offer?
-* **Popular storage formats as an ejection seat**. `ayb` databases are just SQLite files, and `ayb` relies on SQLite for query processing. SQLite is the most widely used database on the planet, and if you one day decide `ayb` isn't for you, you can walk away with your data in a single file. (I one day hope to support other formats like DuckDB's after its storage format stabilizes.)
-* **Easy registration and database creation**. To borrow a tired analogy, `ayb` is like GitHub for your databases: once you create an account on an `ayb` instance, you can create databases quickly and easily. Soon I hope to add features like authentication and permissions so that you can easily share your databases with particular people (or make them publicly accessible).
-* **Multi-tenancy**. While I'd like to believe `ayb` is easy to get up and running, you shouldn't have to be a system administrator to get started. Each `ayb` instance can serve multiple users' databases, so I imagine that in a classroom or newsroom, one person can get it running and everyone else can live on the same instance. After I work through authentication and permissions, I'll plan on running a public `ayb` instance so people can spin up databases without having to run their own instance. Clustering/distribution is on the roadmap so that eventually, if your instance ever needed to, it could run on multiple nodes.
-* **An HTTP API**. To make it easy to integrate into web applications, `ayb` exposes databases over an HTTP API. Down the line I hope to support other wire protocols (e.g., the PostgreSQL wire protocol) for broader compatibility with existing applications.
+Toward that vision, I've been building [ayb](https://github.com/marcua/ayb), which is a multi-tenant database management system with easy-to-host instances that quickly allow you to register an account, create databases, share them with collaborators, and query them from a web application or the command line. With `ayb`, [all your (data)base can finally belong to you](https://www.youtube.com/watch?v=qItugh-fFgg). `ayb` is open source (Apache 2.0-licensed) and require a single command to start a server. What does `ayb` offer?
+* **Popular storage formats as an ejection seat**. `ayb` databases are just SQLite files, and `ayb` relies on SQLite for query processing. SQLite is the most widely used database on the planet, and if you one day decide `ayb` isn't for you, you can walk away with your data in a single file. (We'll support other formats like DuckDB's after its storage format stabilizes.)
+* **Easy registration and database creation**. To borrow a tired analogy, `ayb` is like GitHub for your databases: once you create an account on an `ayb` instance, you can create databases quickly and easily. Next on the roadmap are features like authentication and permissions so that you can easily share your databases with particular people (or make them publicly accessible).
+* **Multi-tenancy**. While `ayb` is easy to get up and running, you shouldn't have to be a system administrator to get started. Each `ayb` instance can serve multiple users' databases, so that in a classroom or newsroom, one person can get it running and everyone else can live on the same instance. Once `ayb` has authentication and permissions, I'll plan on running a public `ayb` instance so people can spin up databases without having to run their own instance. Clustering/distribution is on the roadmap so that eventually, if your instance ever needed to, it could run on multiple nodes.
+* **An HTTP API**. To make it easy to integrate into web applications, `ayb` exposes databases over an HTTP API. Other wire protocols (e.g., the PostgreSQL wire protocol) are on the roadmap for broader compatibility with existing applications.
 
 As it stands, `ayb` is neither feature complete nor production-ready. Functionality like authentication, permissions, collaboration, isolation, high availability, and transaction support are on the [Roadmap](https://github.com/marcua/ayb#roadmap) but not available today. If you want to collaborate, reach out!
 
@@ -35,14 +35,13 @@ cargo install ayb
 An `ayb` server stores its metadata in [SQLite](https://www.sqlite.org/index.html) or [PostgreSQL](https://www.postgresql.org/), and stores the databases it's hosting on a local disk. To configure the server, create an `ayb.toml` configuration file to tell the server what host/port to listen for connections on, how to connect to the database, and the data path for the hosted databases:
 
 ```bash
-cat <<EOF > ayb.toml
+$ cat ayb.toml
 host = "0.0.0.0"
 port = 5433
 database_url = "sqlite://ayb_data/ayb.sqlite"
 # Or, for Postgres:
 # database_url = "postgresql://postgres_user:test@localhost:5432/test_db"
 data_path = "./ayb_data"
-EOF
 ```
 
 Running the server then requires one command
@@ -127,7 +126,7 @@ If `ayb` is successful, it will become easier to create a database, interact wit
 
 **Sharers**. Scientists, journalists, and other people who want to share a data set have largely ad hoc means to share that data, and their collaborators and readers' experience is limited by the ad hoc sharing decisions. You've encountered this if you've ever tried to do something with the CSV file someone shared over email or if you've wanted to visualize the data presented in an article in a slightly different way. Sharers should be able to create a database, add collaborators, and eventually open it up to the public to fork/query in a read-only way with as little overhead for themselves or the recipient as possible.
 
-**Sovereigns**. When you use most hosted applications, you're not in control of your own data. Today's application stack places ownership of the database and data with the organization that wrote the application. While this model has several benefits, it also means that your data isn't yours, which has privacy, security, economic, and extensibility implications. The company that hosts the application has sovereignty over the database that hosts the data, and if you're lucky (or live in a place with reasonable regulations), they allow you to export portions of your data in sometimes unhelpful formats. The most speculative use case I can imagine for `ayb` is that it grants end-users sovereignty over their data. Imagine a world where, before signing up for an application, you spin up an `ayb` database and authorize the application to your new database. As long as you're still getting value from an app, it can provide functionality on top of your data. If you ever change your mind about the app, the data is yours by default, and you can change who has access to your data.
+**Sovereigns**. When you use most hosted applications, you're not in control of your own data. Today's application stack places ownership of the database and data with the organization that wrote the application. While this model has several benefits, it also means that your data isn't yours, which has privacy, security, economic, and extensibility implications. The company that hosts the application has sovereignty over the database that hosts the data, and if you're lucky (or live in a place with reasonable regulations), they allow you to export portions of your data in sometimes unhelpful formats. The most speculative use case for `ayb` is that it grants end-users sovereignty over their data. Imagine a world where, before signing up for an application, you spin up an `ayb` database and authorize the application to your new database. As long as you're still getting value from an app, it can provide functionality on top of your data. If you ever change your mind about the app, the data is yours by default, and you can change who has access to your data.
 
 ## Where to go from here
 Thank you for reading this far. From here, you can:
