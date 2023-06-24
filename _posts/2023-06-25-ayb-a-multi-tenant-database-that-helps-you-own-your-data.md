@@ -1,7 +1,7 @@
 ---
 layout: post
-title: 'ayb: A multi-tenant database that helps you own your data'
-date: 2023-06-25
+title: "ayb: A multi-tenant database that helps you own your data"
+date: 2023-06-25 00:00 +0000
 ---
 ## Introduction
 
