@@ -136,4 +136,4 @@ Thank you for reading this far. From here, you can:
 * Create an issue, email me, or reach out on social media to get started (my [contact information is here](https://marcua.net/) and I promise to be welcoming).
 
 ## Thank you
-Thank you to Sofía Aritz, Meredith Blumenstock, Daniel Haas, Meelap Shah, and Eugene Wu for reading and suggesting improvements to early drafts of this blog post.
+Thank you to Sofía Aritz, Meredith Blumenstock, Daniel Haas, Meelap Shah, and Eugene Wu for reading and suggesting improvements to early drafts of this blog post. Shout out to Meelap Shah and Eugene Wu for convincing me to not call this project `stacks`, to Andrew Lange-Abramowitz for making the connection to the storied meme, and to Meredith Blumenstock for listening to me fret over it all.
