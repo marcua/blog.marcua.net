@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Data diffs: Algorithms for explaining what changed in a dataset"
-date: 2022-02-20 00:00 +0000
+date: 2022-02-20
 ---
 *tl;dr: [part 1](#two-ways-to-ask-for-explanations) explains what an explanation algorithm is, and [part 2](#an-open-source-implementation-of-diff) describes an open source SQL data differ.*
 
