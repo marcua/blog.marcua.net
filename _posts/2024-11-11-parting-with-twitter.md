@@ -7,7 +7,7 @@ For many reasons, it's time for me to leave X/Twitter. I haven't been
 meaningfully active on the platform for a while now, using it largely
 to boost company announcements and otherwise trying to rebuild my
 social network on Mastodon and Bluesky. But now even that restricted
-use case feels irresponsible. We have to pick what companies and
+use case feels irresponsible. We have to pick which companies and
 products deserve the privilege of our attention, and for me, X has not
 been one of those companies for a while.
 
