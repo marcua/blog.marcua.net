@@ -32,3 +32,5 @@ gem "wdm", "~> 0.1.1", :platforms => [:mingw, :x64_mingw, :mswin]
 gem 'jekyll-compose', group: [:jekyll_plugins]
 
 gem 'jekyll-tagging', '~> 1.1'
+
+gem "webrick", "~> 1.9"
