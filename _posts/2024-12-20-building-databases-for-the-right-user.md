@@ -13,6 +13,7 @@ How did we get here? I'd argue it's because the smartest database minds have spe
 The lack of focus on the user didn't come from evil intentions, and there are many technical and organizational reasons why we've centralized data storage and processing. But the end result is the same: while most everyone agrees that you should own your data, most everyone knows that our tools make that challenging or impossible.
 
 Luckily, we can fix the future. I believe that a simple motivating question can rally the database community for many decades to come: **how might we increase people's agency and sovereignty over their own data**? Let's spend the next few decades applying what we've learned so far to the user we should have been designing for all along.
+
 ## How it works today, and why it sucks
 Let's take the traditional architecture of a web application. A user sends their requests to the application. The application logic in turn queries a database that stores the user's data along with the data of other users:
 ![A hand-drawn cartoon diagram in which a user provides data to an application, which inserts it into a database. The database acknowledges the insertion to the application, which acknowledges the insertion to the user.](/assets/images/dbs-right-user/traditional-insert.png)
@@ -23,6 +24,7 @@ The user never interacts with the database directly, and can only interact with 
 The owner of the database, on the other hand, retains most of the power. They can restrict the user's access to their own data. They can delete the data. They can sell the data to a third party. They might introduce a bug that allows other people to access the data. They might get compromised. Or they can avoid all of these mistakes just to be acquired, and have the new management change course.
 
 Put simply: in today's model, your data doesn't live in your database, and so it's not really your data.
+
 ## How it should work
 Let's modify the architecture of the application above. What if it was easy for a user to create a personal database and authorize the application to access it? The user could maintain control over the database, and the web application would gain credentials to the database for as long as the user wished. An application might have access to many users' databases, and would interact with each user's database with credentials that the user authorized it to have. Here's a user sharing the credentials to their database (a key) with an application: 
 ![A hand-drawn cartoon diagram in which both the user and the application hav a database. The user provides a key to their database to an application, which inserts it into its database. The application's database acknowledges the insertion to the application, which acknowledges the insertion to the user.](/assets/images/dbs-right-user/proposed-key.png)
@@ -36,6 +38,7 @@ As long as the application continues to provide utility and the application owne
 The user is newly empowered to control who accesses the data in their database. They can connect their database to other applications, or modify their own data or visualize it in ways any one application doesn't allow. This model doesn't solve all problems, and an application developer could still leak data inadvertently or by design. A bug could still wipe out or corrupt a user's database, and multiple applications might interact in unexpected or undesirable ways. But in a world where users control their own database, users have more choice, and application owners have more accountability.
 
 Put simply: in the future, your data should live in your database, giving you more control over what happens to that data.
+
 ## Terms of data use
 Technologies rarely offer guarantees, and having sovereignty over your database wouldn't either. But this change in architecture would offer benefits beyond the technical: if you own the database, you can set the terms for accessing that data.
 
@@ -51,6 +54,7 @@ In a TODU, you could specify
 Like Terms of Service, a Terms of Data Use doesn't offer a technical guarantee, but it clarifies some expectations you have of the relationship. When you violate an application's TOS, you risk losing access to the application, and when an application violates your terms of data use, the application owner risks losing access to your database.
 
 Newly empowered database owners are unlikely to write their own terms of data use from scratch. With time, standard checklists, templates, and defaults will provide great starting points, much like GitHub makes it easy to pick an open source license for a new project.
+
 ## What would it take?
 Any sane technologist at this point will explain to you that databases are HARD! They'd ask if you really expect *the average person* to spin up a database? To back it up? To ensure it's available? To pick Terms of Data Use? To monitor how their data is used and enforce their own policies?
 
