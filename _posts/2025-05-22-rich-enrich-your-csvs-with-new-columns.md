@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Rich: Enrich your CSVs with new columns"
-date: 2025-05-02
+date: 2025-05-22
 ---
 This week a fellow B12er was performing an ad-hoc data analysis. They had a spreadsheet with some data, and wanted to classify the rows in the spreadsheet by a few different criteria along which they would look for trends. For an engineer, this would have been a quick Python script wrapping some classifier (in our case, the OpenAI API), but there wasn't an engineer available for the project. We looked at some third-party plugins for Google Sheets, but it wasn't clear what sorts of guarantees they made around data privacy, and we didn't feel comfortable installing them. So, with some help from OpenAI's `o3`, I created [Rich, an OpenAI-powered CSV data enricher](https://marcua.net/minitools/rich/) that's a fully client-side single-page application.
 
