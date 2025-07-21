@@ -36,6 +36,10 @@ plugins:
   - jekyll/tagging
 minima:
   skin: dark
+  social_links:
+    - { platform: github,  url: "https://github.com/marcua", title: "GitHub", icon: "github" }
+    - { platform: mastodon, url: "https://hachyderm.io/@marcua", title: "Mastodon", icon: "mastodon" }
+    - { platform: bluesky,  url: "https://bsky.app/profile/marcua.net", title: "Bluesky", icon: "bluesky" }
 show_excerpts: false
 google_analytics: UA-8267962-1
 tag_page_layout: tag-page

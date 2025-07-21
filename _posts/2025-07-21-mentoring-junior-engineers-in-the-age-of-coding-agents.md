@@ -49,4 +49,4 @@ Junior engineers that use coding agents now need to be good at defining tasks th
 
 Despite the speed at which the world of coding agents is moving, I'm pretty confident that the task definition/code review skills gap will remain relevant. The skills we previously delegated to senior team members are now required on day 0 of using a coding agent. If you've thought hard about mentoring junior team members through this change, I'd love to hear from you!
 
-*All mistakes are my own. A coding agent was working in the background on my side project, but an LLM hasn't touched this blog post as of its publication. Thank you to Hunter Knight for reading an early version of this post.*
+*All mistakes are my own. A coding agent was working in the background on my side project, but an LLM hasn't touched this blog post as of its publication :). Thank you to Hunter Knight for reading an early version of this post.*
