@@ -3,7 +3,7 @@ layout: post
 title: "Review: a bookmarklet to generate coding agent-ready code reviews"
 date: 2025-12-08
 ---
-I'm excited to share [Review](http://marcua.net/minitools/review), a bookmarket that makes it easier for you to code review AI coding agents. The bookmarklet turns all unresolved comments on a GitHub pull request into a Markdown-formatted text blob that you can paste into your coding agent of choice. Since a video is worth a thousand words, here's the tool in action with Claude Code:
+I'm excited to share [Review](http://marcua.net/minitools/review), a bookmarklet that makes it easier for you to code review AI coding agents. The bookmarklet turns all unresolved comments on a GitHub pull request into a Markdown-formatted text blob that you can paste into your coding agent of choice. Since a video is worth a thousand words, here's the tool in action with Claude Code:
 <video width="640" height="360" controls>  
   <source src="/assets/video/review-bookmarklet-code-review-ai-agents/review.mp4" type="video/mp4">   
 </video>
