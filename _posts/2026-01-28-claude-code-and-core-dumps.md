@@ -1,10 +1,9 @@
 ---
 layout: post
-title: "Claude Code and core dumps: Tracking down a nasty bug during a production incident alongside an energetic explorer"
+title: "Claude Code and core dumps"
+subtitle: "Tracking down a nasty bug during a production incident alongside an energetic explorer"
 date: 2026-01-28
 ---
-Tracking down a nasty bug during a production incident alongside an energetic explorer
-
 While the most common use case I have for using coding agents is to...generate code...I've also found them quite useful for operational and incident response work. I experienced an interesting use case while on call over the holidays that I figured I'd document in case anyone ends up in a similar spot. In short: a rare and nearly decade-old bug in an infrequently used endpoint was filling up our disks with [core dump](https://en.wikipedia.org/wiki/Core_dump) files. Claude Code helped me track down the root cause and iterated on a fix with me. I estimate it saved me hours or a small number of days of work given my unfamiliarity with core dumps.
 
 First I'll share the story of the incident and how Claude and I got to the bottom of it, and then I'll share some higher-level takeaways and initial impressions.
