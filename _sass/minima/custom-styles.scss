@@ -1,12 +1,35 @@
 // Custom styles for post headers
 .post-header {
   text-align: left !important;
-  
+
   .post-title {
     text-align: left !important;
   }
-  
+
   .post-meta {
     text-align: left !important;
+    color: #c8c8c8;
+  }
+
+  .post-subtitle {
+    font-size: 1.25rem;
+    color: #c8c8c8;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+}
+
+// Post content typography improvements
+.post-content {
+  max-width: 680px;
+  letter-spacing: 0.02em;
+
+  h3 {
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 1.5em;
   }
 }
