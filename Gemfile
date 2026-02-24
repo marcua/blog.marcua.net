@@ -34,3 +34,5 @@ gem 'jekyll-compose', group: [:jekyll_plugins]
 gem 'jekyll-tagging', '~> 1.1'
 
 gem "webrick", "~> 1.9"
+
+gem "csv"
