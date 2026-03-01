@@ -34,13 +34,10 @@
 }
 
 // Vertically center the nav button within the header on mobile
-// and prevent the expanded menu from overflowing the viewport
+// Use a fixed top value so the dropdown expands downward without shifting
 @media screen and (max-width: $on-medium) {
   .site-nav {
-    top: 50% !important;
-    transform: translateY(-50%);
-    max-width: calc(100vw - #{$spacing-unit * 1.2});
-    overflow-wrap: break-word;
+    top: calc((#{$base-line-height * $base-font-size * 2.25} - 38px) / 2) !important;
   }
 }
 
