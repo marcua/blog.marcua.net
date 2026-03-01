@@ -1,6 +1,9 @@
 // Custom styles for post headers
 .post-header {
   text-align: left !important;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
 
   .post-title {
     text-align: left !important;
@@ -23,6 +26,11 @@
 // Use the site link color for nav items instead of text color
 .site-nav .nav-item {
   color: $link-base-color;
+}
+
+// Use inline SVG for hamburger icon instead of Font Awesome (which may not load)
+.site-nav .menu-icon::before {
+  content: none !important;
 }
 
 // Post content typography improvements
