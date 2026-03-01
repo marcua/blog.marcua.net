@@ -33,6 +33,15 @@
   content: none !important;
 }
 
+// Vertically center the SVG hamburger icon within its container
+.site-nav .menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0;
+  height: 36px;
+}
+
 // Post content typography improvements
 .post-content {
   max-width: 680px;
