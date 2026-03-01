@@ -33,6 +33,11 @@
   content: none !important;
 }
 
+// Vertically center the nav button within the header on mobile
+.site-nav {
+  line-height: $base-line-height * $base-font-size * 2.25;
+}
+
 // Vertically center the SVG hamburger icon within its container
 .site-nav .menu-icon {
   display: flex;
