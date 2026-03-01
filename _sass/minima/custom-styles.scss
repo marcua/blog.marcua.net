@@ -20,6 +20,11 @@
   }
 }
 
+// Use the site link color for nav items instead of text color
+.site-nav .nav-item {
+  color: $link-base-color;
+}
+
 // Post content typography improvements
 .post-content {
   max-width: 680px;
