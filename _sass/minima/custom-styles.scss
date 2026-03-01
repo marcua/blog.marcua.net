@@ -1,6 +1,9 @@
 // Custom styles for post headers
 .post-header {
   text-align: left !important;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
 
   .post-title {
     text-align: left !important;
@@ -18,6 +21,33 @@
     margin-bottom: 1rem;
     font-style: italic;
   }
+}
+
+// Use the site link color for nav items instead of text color
+.site-nav .nav-item {
+  color: $link-base-color;
+}
+
+// Use inline SVG for hamburger icon instead of Font Awesome (which may not load)
+.site-nav .menu-icon::before {
+  content: none !important;
+}
+
+// Vertically center the nav button within the header on mobile
+// Use a fixed top value so the dropdown expands downward without shifting
+@media screen and (max-width: $on-medium) {
+  .site-nav {
+    top: calc((#{$base-line-height * $base-font-size * 2.25} - 38px) / 2) !important;
+  }
+}
+
+// Vertically center the SVG hamburger icon within its container
+.site-nav .menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0;
+  height: 36px;
 }
 
 // Post content typography improvements
