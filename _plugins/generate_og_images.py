@@ -85,9 +85,9 @@ def extract_paragraphs(body, max_chars=500):
     # Remove HTML tags
     body = re.sub(r"<[^>]+>", "", body)
     # Turn bullet lines into separate paragraphs by adding a blank line before each
-    body = re.sub(r"\n(\s*[\*\-]\s+)", r"\n\n\1", body)
-    # Remove bullet markers themselves
-    body = re.sub(r"^\s*[\*\-]\s+", "", body, flags=re.MULTILINE)
+    body = re.sub(r"\n([ \t]*[\*\-]\s+)", r"\n\n\1", body)
+    # Remove bullet markers themselves (only horizontal whitespace before marker)
+    body = re.sub(r"^[ \t]*[\*\-]\s+", "", body, flags=re.MULTILINE)
 
     # Split into paragraphs and take non-empty ones
     paragraphs = [p.strip() for p in body.split("\n\n") if p.strip()]
