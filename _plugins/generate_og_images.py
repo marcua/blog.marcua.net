@@ -33,9 +33,31 @@ BODY_COLOR = "#b0b0b0"
 ACCENT_COLOR = "#7eb8da"
 MUTED_COLOR = "#808080"
 
-# Fonts (DejaVu Sans is available on most Linux systems)
-FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-FONT_REGULAR = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+def _find_font(candidates):
+    """Return the first font path that exists, or fall back to Pillow default."""
+    for path in candidates:
+        if Path(path).exists():
+            return path
+    return None  # will use Pillow's built-in default
+
+
+FONT_BOLD = _find_font([
+    # macOS
+    "/System/Library/Fonts/Helvetica.ttc",
+    "/Library/Fonts/Arial Bold.ttf",
+    # Linux (DejaVu)
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
+])
+
+FONT_REGULAR = _find_font([
+    # macOS
+    "/System/Library/Fonts/Helvetica.ttc",
+    "/Library/Fonts/Arial.ttf",
+    # Linux (DejaVu)
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/usr/share/fonts/TTF/DejaVuSans.ttf",
+])
 
 
 def parse_post(filepath):
@@ -133,12 +155,17 @@ def generate_og_image(frontmatter, body, output_path):
     img = Image.new("RGB", (WIDTH, HEIGHT), BG_COLOR)
     draw = ImageDraw.Draw(img)
 
-    # Load fonts
-    font_title = ImageFont.truetype(FONT_BOLD, 36)
-    font_subtitle = ImageFont.truetype(FONT_REGULAR, 22)
-    font_body = ImageFont.truetype(FONT_REGULAR, 18)
-    font_meta = ImageFont.truetype(FONT_REGULAR, 16)
-    font_site = ImageFont.truetype(FONT_BOLD, 16)
+    # Load fonts (fall back to Pillow default if no system font found)
+    def _load(path, size):
+        if path:
+            return ImageFont.truetype(path, size)
+        return ImageFont.load_default(size=size)
+
+    font_title = _load(FONT_BOLD, 36)
+    font_subtitle = _load(FONT_REGULAR, 22)
+    font_body = _load(FONT_REGULAR, 18)
+    font_meta = _load(FONT_REGULAR, 16)
+    font_site = _load(FONT_BOLD, 16)
 
     margin_x = 60
     max_text_width = WIDTH - 2 * margin_x
