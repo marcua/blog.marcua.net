@@ -1,5 +1,5 @@
 Jekyll::Hooks.register :site, :after_init do |site|
-  script = File.join(site.source, "generate_og_images.py")
+  script = File.join(site.source, "_plugins", "generate_og_images.py")
   next unless File.exist?(script)
 
   Jekyll.logger.info "OG Images:", "Generating preview images..."
