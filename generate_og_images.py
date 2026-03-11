@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "pillow",
+#     "pyyaml",
+# ]
+# ///
 """Generate Open Graph preview images for blog posts.
 
 Each image includes the post title, subtitle, date, and first few
 paragraphs of body text, styled to match the blog's dark theme.
 """
 
-import os
 import re
-import textwrap
 from datetime import datetime
 from pathlib import Path
 

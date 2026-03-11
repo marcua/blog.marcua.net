@@ -1,3 +1,17 @@
+Jekyll::Hooks.register :site, :after_init do |site|
+  script = File.join(site.source, "generate_og_images.py")
+  next unless File.exist?(script)
+
+  Jekyll.logger.info "OG Images:", "Generating preview images..."
+  output = `uv run #{script} 2>&1`
+  status = $?
+  if status.success?
+    output.each_line { |l| Jekyll.logger.info "OG Images:", l.chomp }
+  else
+    output.each_line { |l| Jekyll.logger.warn "OG Images:", l.chomp }
+  end
+end
+
 Jekyll::Hooks.register :posts, :pre_render do |post|
   next if post.data['image']
 
