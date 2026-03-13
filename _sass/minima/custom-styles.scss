@@ -168,9 +168,26 @@ a {
       padding: 24px 0;
       border-bottom: 1px solid var(--border-subtle);
 
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    // Year headings: no extra padding, no double borders
+    > li.year-heading {
+      padding: 0;
+      padding-top: 40px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+
       &:first-child {
         padding-top: 0;
       }
+    }
+
+    // Remove top padding on the first post after a year heading
+    > li.year-heading + li {
+      padding-top: 16px;
     }
 
     .post-meta {
@@ -213,21 +230,14 @@ a {
     margin: 0;
   }
 
-  // Year group headers
+  // Year group headers (positioning rules are in .post-list > li.year-heading above)
   .year-heading {
     font-size: 0.8rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text-muted);
-    margin-top: 48px;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-subtle);
-
-    &:first-child {
-      margin-top: 0;
-    }
+    list-style: none;
   }
 }
 
@@ -349,6 +359,22 @@ a {
       padding: 0;
       background: none;
       border-radius: 0;
+    }
+  }
+
+  // Remove Rouge/Minima syntax highlighter accent bar
+  .highlight {
+    background: var(--bg-code);
+    border: none;
+
+    pre {
+      border: 1px solid var(--border-subtle);
+    }
+
+    // Remove any colored bar/border from the wrapper
+    &::before,
+    &::after {
+      display: none;
     }
   }
 
