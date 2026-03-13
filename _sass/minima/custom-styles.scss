@@ -1,65 +1,498 @@
-// Custom styles for post headers
+// === Design System Overhaul ===
+// Single-family (Inter) hierarchy via weight, size, tracking, color.
+
+// --- CSS Custom Properties ---
+:root {
+  --bg-primary: #{$bg-primary};
+  --bg-surface: #{$bg-surface};
+  --border-subtle: #{$border-subtle};
+  --text-heading: #{$text-heading};
+  --text-body: #{$text-body-color};
+  --text-muted: #{$text-muted};
+  --accent: #{$accent};
+  --accent-hover: #{$accent-hover};
+  --accent-visited: #{$accent-visited};
+  --bg-code: #{$bg-code};
+  --focus-ring: #{$focus-ring};
+}
+
+// --- Skip to Content (accessibility) ---
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 999;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+
+  &:focus {
+    left: 0;
+  }
+}
+
+// --- Global ---
+body {
+  font-family: $base-font-family;
+  background-color: var(--bg-primary);
+  color: var(--text-body);
+}
+
+// --- Focus indicators ---
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+// --- Links ---
+a {
+  color: var(--accent);
+  transition: color 150ms ease;
+
+  &:visited {
+    color: var(--accent-visited);
+  }
+
+  &:hover {
+    color: var(--accent-hover);
+  }
+}
+
+// --- Header ---
+.site-header {
+  border-top: none;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 20px 0;
+  background: var(--bg-primary);
+
+  .wrapper {
+    max-width: 960px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.site-title {
+  font-family: $base-font-family;
+  font-size: 1rem !important;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted) !important;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--text-body) !important;
+    text-decoration: none;
+  }
+
+  &:visited {
+    color: var(--text-muted) !important;
+  }
+}
+
+.site-nav {
+  .nav-item {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text-body);
+    }
+
+    &:visited {
+      color: var(--text-muted);
+    }
+  }
+
+  // Hamburger icon styling
+  .menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    height: 36px;
+
+    > svg {
+      fill: var(--text-muted);
+    }
+  }
+
+  .menu-icon::before {
+    content: none !important;
+  }
+}
+
+// Mobile nav positioning
+@media screen and (max-width: $on-medium) {
+  .site-nav {
+    top: calc((#{$base-line-height * $base-font-size * 2.25} - 38px) / 2) !important;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+
+    .nav-item {
+      padding: 8px 0;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+// --- Content column ---
+.page-content {
+  .wrapper {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-top: 64px;
+    padding-bottom: 80px;
+  }
+}
+
+// --- Home / Post List ---
+.home {
+  .post-list {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+
+    > li {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border-subtle);
+
+      &:first-child {
+        padding-top: 0;
+      }
+    }
+
+    .post-meta {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 1.563rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.3;
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        &:visited {
+          color: var(--accent-visited);
+        }
+      }
+    }
+  }
+
+  .post-excerpt {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  // Year group headers
+  .year-heading {
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-top: 48px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-subtle);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+// --- Post Body ---
 .post-header {
   text-align: left !important;
   border-bottom: none;
   padding-bottom: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 32px;
 
   .post-title {
     text-align: left !important;
-  }
-
-  .post-meta {
-    text-align: left !important;
-    color: #c8c8c8;
+    font-size: 2.441rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--text-heading);
+    margin-bottom: 8px;
   }
 
   .post-subtitle {
     font-size: 1.25rem;
-    color: #c8c8c8;
-    margin-top: -0.5rem;
-    margin-bottom: 1rem;
+    color: var(--text-muted);
+    margin-top: 0;
+    margin-bottom: 12px;
     font-style: italic;
+    line-height: 1.4;
+  }
+
+  .post-meta {
+    text-align: left !important;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
   }
 }
 
-// Use the site link color for nav items instead of text color
-.site-nav .nav-item {
-  color: $link-base-color;
-}
-
-// Use inline SVG for hamburger icon instead of Font Awesome (which may not load)
-.site-nav .menu-icon::before {
-  content: none !important;
-}
-
-// Vertically center the nav button within the header on mobile
-// Use a fixed top value so the dropdown expands downward without shifting
-@media screen and (max-width: $on-medium) {
-  .site-nav {
-    top: calc((#{$base-line-height * $base-font-size * 2.25} - 38px) / 2) !important;
-  }
-}
-
-// Vertically center the SVG hamburger icon within its container
-.site-nav .menu-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 0;
-  height: 36px;
-}
-
-// Post content typography improvements
 .post-content {
   max-width: 680px;
-  letter-spacing: 0.02em;
+
+  h2 {
+    font-size: 1.953rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    color: var(--text-heading);
+    margin-top: 48px;
+    margin-bottom: 16px;
+  }
 
   h3 {
+    font-size: 1.563rem;
     font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-heading);
+    margin-top: 48px;
+    margin-bottom: 16px;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-heading);
+    margin-top: 32px;
+    margin-bottom: 12px;
   }
 
   p {
     margin-bottom: 1.5em;
   }
+
+  // Body links
+  a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  // Blockquotes
+  blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+    margin-left: 0;
+    font-style: italic;
+    color: var(--text-muted);
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Code blocks
+  pre,
+  code {
+    font-family: $code-font-family;
+    font-size: 0.9rem;
+  }
+
+  code {
+    background-color: var(--bg-code);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  pre {
+    background-color: var(--bg-code);
+    border-radius: 6px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    border: 1px solid var(--border-subtle);
+
+    code {
+      padding: 0;
+      background: none;
+      border-radius: 0;
+    }
+  }
+
+  // Lists
+  ul, ol {
+    padding-left: 24px;
+
+    li {
+      margin-bottom: 8px;
+    }
+  }
+
+  // Images
+  img {
+    max-width: 100%;
+    border-radius: 6px;
+  }
+
+  // Horizontal rules — signature diamond mark
+  hr {
+    border: none;
+    text-align: center;
+    margin: 48px 0;
+
+    &::after {
+      content: "◆";
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.5em;
+    }
+  }
+}
+
+// --- Footer ---
+.site-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 48px 0;
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+
+  .wrapper {
+    max-width: 960px;
+  }
+
+  .footer-col-wrapper {
+    color: var(--text-muted);
+  }
+
+  .footer-col {
+    p {
+      color: var(--text-muted);
+    }
+  }
+
+  a {
+    color: var(--accent);
+
+    &:visited {
+      color: var(--accent);
+    }
+  }
+
+  .contact-list {
+    .p-name {
+      color: var(--text-body);
+      font-weight: 600;
+    }
+  }
+
+  .social-links {
+    a {
+      text-decoration: none;
+    }
+
+    .svg-icon {
+      width: 20px;
+      height: 20px;
+      fill: var(--text-muted);
+      transition: fill 150ms ease;
+      vertical-align: middle;
+    }
+
+    a:hover .svg-icon {
+      fill: var(--accent);
+    }
+
+    // Ensure social link tap targets are large enough
+    li {
+      display: inline-block;
+      margin-right: 16px;
+    }
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+}
+
+// --- Responsive ---
+@media screen and (max-width: $on-medium) {
+  .page-content .wrapper {
+    padding-top: 40px;
+    padding-bottom: 48px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .post-header .post-title {
+    font-size: 2rem;
+  }
+}
+
+@media screen and (max-width: $on-palm) {
+  .page-content .wrapper {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .post-header .post-title {
+    font-size: 1.8rem;
+  }
+
+  .site-footer .footer-col-wrapper {
+    flex-direction: column;
+  }
+}
+
+// --- Reduced motion ---
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+// Smooth scroll for anchor links
+html {
+  scroll-behavior: smooth;
 }

@@ -25,13 +25,13 @@ OUTPUT_DIR = Path("assets/images/og")
 WIDTH = 1200
 HEIGHT = 630
 
-# Minima dark theme colors
-BG_COLOR = "#1e1e1e"
-TITLE_COLOR = "#e8e8e8"
-SUBTITLE_COLOR = "#c8c8c8"
-BODY_COLOR = "#b0b0b0"
-ACCENT_COLOR = "#7eb8da"
-MUTED_COLOR = "#808080"
+# Blog design system colors
+BG_COLOR = "#111113"
+TITLE_COLOR = "#eeeeef"
+SUBTITLE_COLOR = "#d1d1d6"
+BODY_COLOR = "#d1d1d6"
+ACCENT_COLOR = "#8b8ef5"
+MUTED_COLOR = "#8e8e93"
 
 def _find_font(candidates):
     """Return the first font path that exists, or fall back to Pillow default."""
