@@ -1,10 +1,44 @@
-// Typography improvements for dark mode readability
+// === Design System Tokens ===
 
-// Brighter body text (from #959595)
-$text-color: #c8c8c8;
-
-// Increased line height for readability (from 1.5)
+// Typography
+$base-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$code-font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+$base-font-size: 18px;
 $base-line-height: 1.7;
 
-// Larger base font size (from 16px)
-$base-font-size: 17px;
+// Color palette
+$bg-primary: #111113;
+$bg-surface: #1a1a1f;
+$border-subtle: #2a2a30;
+$text-heading: #eeeeef;
+$text-body-color: #d1d1d6;
+$text-muted: #8e8e93;
+$accent: #8b8ef5;
+$accent-hover: #abadf8;
+$accent-visited: #a496c8;
+$bg-code: #1e1e24;
+$focus-ring: rgba(139, 142, 245, 0.5);
+
+// Map to Minima's expected variables
+$brand-color: $accent;
+$brand-color-light: $accent-hover;
+$brand-color-dark: $accent;
+$site-title-color: $text-muted;
+$text-color: $text-body-color;
+$background-color: $bg-primary;
+$code-background-color: $bg-code;
+$border-color-01: $border-subtle;
+$border-color-02: $border-subtle;
+$border-color-03: $border-subtle;
+$table-text-color: $text-body-color;
+$table-zebra-color: $bg-surface;
+$table-header-bg-color: $bg-surface;
+$table-header-border: $border-subtle;
+$table-border-color: $border-subtle;
+$link-base-color: $accent;
+$link-visited-color: $accent-visited;
+
+// Layout
+$content-width: 960px;
+$on-palm: 480px;
+$on-medium: 768px;
