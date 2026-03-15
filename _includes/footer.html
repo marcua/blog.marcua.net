@@ -1,0 +1,26 @@
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <a href="{{ '/' | relative_url }}" class="footer-title">{{ site.title | escape }}</a>
+        {%- if site.author %}
+          <p class="footer-author">by {{ site.author.name | escape }}</p>
+        {%- endif %}
+      </div>
+      <div class="footer-links">
+        {%- if site.minima.social_links -%}
+          {%- for link in site.minima.social_links -%}
+            <a href="{{ link.url }}" class="footer-link" title="{{ link.title }}">{{ link.title }}</a>
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if site.author.email -%}
+          <a href="mailto:{{ site.author.email }}" class="footer-link">Email</a>
+        {%- endif -%}
+        <a href="{{ '/feed.xml' | relative_url }}" class="footer-link">RSS</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">&copy; {{ 'now' | date: "%Y" }} {{ site.author.name | escape }}</span>
+    </div>
+  </div>
+</footer>

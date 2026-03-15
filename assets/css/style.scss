@@ -1,6 +1,933 @@
 ---
 ---
 
-@import "minima/skins/{{ site.minima.skin | default: 'classic' }}";
-@import "minima/initialize";
-@import "minima/custom-styles";
+// ============================================================
+// WARM INK — A modern editorial blog theme
+// ============================================================
+
+// --- Color tokens ---
+$bg-deep:       #0a0a0b;
+$bg-surface:    #111113;
+$bg-elevated:   #1a1a1d;
+$bg-hover:      #222226;
+
+$text-primary:  #e8e4df;
+$text-secondary:#9e9a94;
+$text-muted:    #6b6862;
+
+$accent:        #d4956a;
+$accent-dim:    #b07a54;
+$accent-glow:   rgba(212, 149, 106, 0.12);
+
+$sage:          #8b9a82;
+
+$border:        #2a2a2e;
+$border-light:  #363639;
+
+// --- Typography ---
+$font-heading:  'Space Grotesk', system-ui, sans-serif;
+$font-body:     'DM Sans', system-ui, sans-serif;
+$font-mono:     'JetBrains Mono', 'Fira Code', monospace;
+
+// --- Spacing ---
+$content-width:  720px;
+$wide-width:    1080px;
+$gutter:         clamp(1.25rem, 4vw, 3rem);
+
+// ============================================================
+// RESET & BASE
+// ============================================================
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 17px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-body;
+  background: $bg-deep;
+  color: $text-primary;
+  line-height: 1.72;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+// Subtle noise grain overlay
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+a {
+  color: $accent;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: lighten($accent, 12%);
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+// ============================================================
+// ANIMATIONS
+// ============================================================
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes accentSlide {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// ============================================================
+// HEADER
+// ============================================================
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba($bg-deep, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid $border;
+}
+
+.header-inner {
+  max-width: $wide-width;
+  margin: 0 auto;
+  padding: 0 $gutter;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.site-title {
+  font-family: $font-heading;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: $text-primary;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.site-title-marker {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: $accent;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+}
+
+.nav-trigger {
+  display: none;
+}
+
+.menu-toggle {
+  display: none;
+  cursor: pointer;
+  color: $text-secondary;
+  padding: 8px;
+  line-height: 0;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.nav-items {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.nav-item {
+  font-family: $font-heading;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: $text-secondary;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:hover {
+    color: $text-primary;
+    background: $bg-elevated;
+  }
+}
+
+.nav-social {
+  font-size: 0.8rem;
+  color: $text-muted;
+}
+
+// Mobile nav
+@media (max-width: 640px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-items {
+    display: none;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: $bg-surface;
+    border-bottom: 1px solid $border;
+    flex-direction: column;
+    padding: 0.75rem $gutter;
+    gap: 0;
+  }
+
+  .nav-item {
+    width: 100%;
+    padding: 0.7rem 0.75rem;
+    border-radius: 8px;
+  }
+
+  .nav-trigger:checked ~ .nav-items {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+}
+
+// ============================================================
+// HERO (home page)
+// ============================================================
+.hero {
+  padding: clamp(3rem, 8vw, 6rem) $gutter clamp(2rem, 5vw, 3.5rem);
+  animation: fadeUp 0.7s ease both;
+}
+
+.hero-inner {
+  max-width: $wide-width;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero-accent {
+  width: 48px;
+  height: 3px;
+  background: $accent;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  animation: accentSlide 0.6s ease 0.3s both;
+  transform-origin: left;
+}
+
+.hero-title {
+  font-family: $font-heading;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: $text-primary;
+  margin-bottom: 1rem;
+}
+
+.hero-description {
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  color: $text-secondary;
+  max-width: 580px;
+  line-height: 1.7;
+}
+
+// ============================================================
+// POST FEED (home page list)
+// ============================================================
+.post-feed {
+  padding: 0 $gutter 4rem;
+}
+
+.post-feed-inner {
+  max-width: $wide-width;
+  margin: 0 auto;
+}
+
+.post-card {
+  display: flex;
+  gap: clamp(1rem, 3vw, 2rem);
+  padding: 1.5rem 0;
+  border-top: 1px solid $border;
+  animation: fadeUp 0.5s ease both;
+  animation-delay: var(--delay);
+  transition: border-color 0.3s ease;
+
+  &:hover {
+    border-color: $accent-dim;
+  }
+
+  &:last-child {
+    border-bottom: 1px solid $border;
+  }
+}
+
+.post-card-date {
+  flex-shrink: 0;
+  width: 70px;
+  padding-top: 0.15rem;
+
+  time {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.post-card-month {
+  font-family: $font-heading;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: $text-muted;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.post-card-day {
+  font-family: $font-heading;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: $accent;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.post-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-card-title {
+  font-family: $font-heading;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+
+  a {
+    color: $text-primary;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $accent;
+    }
+  }
+}
+
+.post-card-subtitle {
+  font-size: 0.95rem;
+  color: $text-secondary;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.post-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.tag {
+  font-family: $font-heading;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: $sage;
+  background: rgba($sage, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:hover {
+    color: lighten($sage, 15%);
+    background: rgba($sage, 0.18);
+  }
+}
+
+@media (max-width: 480px) {
+  .post-card {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .post-card-date {
+    width: auto;
+
+    time {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+  }
+
+  .post-card-day {
+    font-size: 1rem;
+  }
+}
+
+// ============================================================
+// POST (single article)
+// ============================================================
+.post-hero {
+  padding: clamp(2.5rem, 6vw, 5rem) $gutter clamp(1.5rem, 3vw, 2.5rem);
+  animation: fadeUp 0.6s ease both;
+}
+
+.post-hero-inner {
+  max-width: $content-width;
+  margin: 0 auto;
+}
+
+.post-meta-top {
+  font-family: $font-heading;
+  font-size: 0.82rem;
+  color: $text-muted;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  time {
+    color: $accent;
+    font-weight: 500;
+  }
+
+  .meta-sep {
+    color: $border-light;
+  }
+}
+
+.post .post-title {
+  font-family: $font-heading;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: $text-primary;
+  margin-bottom: 0.7rem;
+}
+
+.post .post-subtitle {
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  color: $text-secondary;
+  line-height: 1.6;
+  font-style: normal;
+  margin-bottom: 1rem;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+// ============================================================
+// POST BODY / CONTENT
+// ============================================================
+.post-body {
+  padding: 0 $gutter 4rem;
+  animation: fadeUp 0.6s ease 0.15s both;
+}
+
+.post-content {
+  max-width: $content-width;
+  margin: 0 auto;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+
+  > * + * {
+    margin-top: 1.5em;
+  }
+
+  h2 {
+    font-family: $font-heading;
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: $text-primary;
+    margin-top: 2.8em;
+    margin-bottom: 0.6em;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-family: $font-heading;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: $text-primary;
+    margin-top: 2.2em;
+    margin-bottom: 0.5em;
+    line-height: 1.25;
+  }
+
+  h4 {
+    font-family: $font-heading;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-top: 1.8em;
+    margin-bottom: 0.4em;
+  }
+
+  p {
+    margin-bottom: 1.4em;
+    color: $text-primary;
+    line-height: 1.78;
+  }
+
+  strong {
+    font-weight: 600;
+    color: lighten($text-primary, 4%);
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  a {
+    color: $accent;
+    text-decoration: underline;
+    text-decoration-color: rgba($accent, 0.3);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s ease;
+
+    &:hover {
+      text-decoration-color: $accent;
+    }
+  }
+
+  blockquote {
+    border-left: 3px solid $accent;
+    padding: 0.8em 1.2em;
+    margin: 1.8em 0;
+    background: $bg-surface;
+    border-radius: 0 6px 6px 0;
+    color: $text-secondary;
+    font-style: italic;
+
+    p {
+      margin-bottom: 0.5em;
+      color: $text-secondary;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  ul, ol {
+    padding-left: 1.4em;
+    margin-bottom: 1.4em;
+  }
+
+  li {
+    margin-bottom: 0.5em;
+    line-height: 1.72;
+
+    &::marker {
+      color: $accent-dim;
+    }
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    background: $border;
+    margin: 2.5em 0;
+  }
+
+  // Code
+  code {
+    font-family: $font-mono;
+    font-size: 0.88em;
+    background: $bg-elevated;
+    color: $accent;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    border: 1px solid $border;
+  }
+
+  pre {
+    background: $bg-surface;
+    border: 1px solid $border;
+    border-radius: 8px;
+    padding: 1.25em 1.5em;
+    overflow-x: auto;
+    margin: 1.8em 0;
+
+    code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.85rem;
+      color: $text-primary;
+      line-height: 1.65;
+    }
+  }
+
+  // Images and figures
+  img {
+    border-radius: 8px;
+    margin: 0.5em 0;
+  }
+
+  // Tables (for the image captions pattern used in posts)
+  table {
+    width: 100%;
+    margin: 1.8em 0;
+    border-collapse: collapse;
+
+    td, th {
+      padding: 0.6em 0;
+      text-align: center;
+      font-size: 0.88rem;
+      color: $text-secondary;
+      line-height: 1.5;
+    }
+  }
+}
+
+// ============================================================
+// TAG PAGE
+// ============================================================
+.tag-page {
+  max-width: $content-width;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) $gutter 4rem;
+  animation: fadeUp 0.6s ease both;
+}
+
+.tag-page-title {
+  font-family: $font-heading;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+  color: $text-primary;
+
+  .tag-name {
+    color: $accent;
+  }
+}
+
+.tag-page-list {
+  list-style: none;
+  padding: 0;
+
+  li {
+    padding: 0.9rem 0;
+    border-bottom: 1px solid $border;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+
+    &:first-child {
+      border-top: 1px solid $border;
+    }
+  }
+
+  .tag-post-date {
+    font-family: $font-heading;
+    font-size: 0.82rem;
+    color: $text-muted;
+    flex-shrink: 0;
+    min-width: 90px;
+  }
+
+  .tag-post-link {
+    font-family: $font-heading;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: $text-primary;
+    text-decoration: none;
+
+    &:hover {
+      color: $accent;
+    }
+  }
+}
+
+.tag-cloud {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid $border;
+
+  .tag-cloud-label {
+    font-family: $font-heading;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1rem;
+  }
+
+  a {
+    display: inline-block;
+    margin: 0.2rem;
+  }
+}
+
+// ============================================================
+// 404 PAGE
+// ============================================================
+.error-page {
+  max-width: $content-width;
+  margin: 0 auto;
+  padding: clamp(4rem, 10vw, 8rem) $gutter;
+  text-align: center;
+  animation: fadeUp 0.6s ease both;
+}
+
+.error-code {
+  font-family: $font-heading;
+  font-size: clamp(4rem, 10vw, 7rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: $accent;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  font-size: 1.15rem;
+  color: $text-secondary;
+  margin-bottom: 2rem;
+}
+
+.error-link {
+  font-family: $font-heading;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: $accent;
+  text-decoration: none;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid $accent-dim;
+  border-radius: 6px;
+  display: inline-block;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $accent-glow;
+    color: lighten($accent, 8%);
+  }
+}
+
+// ============================================================
+// FOOTER
+// ============================================================
+.site-footer {
+  border-top: 1px solid $border;
+  margin-top: 2rem;
+}
+
+.footer-inner {
+  max-width: $wide-width;
+  margin: 0 auto;
+  padding: 2.5rem $gutter 2rem;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.footer-title {
+  font-family: $font-heading;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: $text-primary;
+  text-decoration: none;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.footer-author {
+  font-size: 0.85rem;
+  color: $text-muted;
+  margin-top: 0.3rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.footer-link {
+  font-family: $font-heading;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: $text-muted;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:hover {
+    color: $text-primary;
+    background: $bg-elevated;
+  }
+}
+
+.footer-bottom {
+  border-top: 1px solid $border;
+  padding-top: 1.2rem;
+}
+
+.footer-copy {
+  font-size: 0.78rem;
+  color: $text-muted;
+}
+
+// ============================================================
+// PAGE LAYOUT (generic pages)
+// ============================================================
+.page-content {
+  min-height: calc(100vh - 64px - 200px);
+
+  // Override minima wrapper
+  .wrapper {
+    max-width: $content-width;
+    margin: 0 auto;
+    padding: 2rem $gutter;
+  }
+}
+
+// ============================================================
+// SYNTAX HIGHLIGHTING
+// ============================================================
+.highlight {
+  background: $bg-surface;
+  border-radius: 8px;
+  border: 1px solid $border;
+  margin: 1.8em 0;
+
+  pre {
+    background: transparent;
+    border: none;
+    margin: 0;
+  }
+
+  // Token colors for dark theme
+  .c, .cm, .c1, .cs  { color: #636870; font-style: italic; } // Comments
+  .k, .kd, .kn, .kp,
+  .kr, .kt            { color: #c792ea; } // Keywords
+  .s, .s1, .s2, .sb,
+  .sc, .sd, .sh, .sx  { color: #c3e88d; } // Strings
+  .na                  { color: #82aaff; } // Attribute names
+  .nb                  { color: #82aaff; } // Built-in names
+  .nc                  { color: #ffcb6b; } // Class names
+  .nf, .fm             { color: #82aaff; } // Function names
+  .no                  { color: $accent; } // Constants
+  .ni                  { color: $text-primary; } // Entity
+  .ne                  { color: #f07178; } // Exceptions
+  .nn                  { color: #ffcb6b; } // Namespace
+  .nt                  { color: #f07178; } // Tag names
+  .nv, .vi, .vg, .vc  { color: #f07178; } // Variables
+  .o, .ow              { color: #89ddff; } // Operators
+  .p                   { color: #89ddff; } // Punctuation
+  .m, .mi, .mf, .mh,
+  .il                  { color: #f78c6c; } // Numbers
+  .err                 { color: #f07178; } // Errors
+  .bp                  { color: #82aaff; } // Python built-in pseudo
+  .gd                  { color: #f07178; } // Diff deleted
+  .gi                  { color: #c3e88d; } // Diff inserted
+}
+
+// ============================================================
+// SELECTION
+// ============================================================
+::selection {
+  background: rgba($accent, 0.25);
+  color: $text-primary;
+}
+
+// ============================================================
+// SCROLLBAR
+// ============================================================
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-deep;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-light;
+  border-radius: 4px;
+
+  &:hover {
+    background: $text-muted;
+  }
+}
