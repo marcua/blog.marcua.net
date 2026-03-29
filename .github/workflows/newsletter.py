@@ -4,6 +4,7 @@ import json
 import os
 import re
 import time
+import urllib.parse
 import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
@@ -77,18 +78,24 @@ def parse_feed(xml_text):
     return posts
 
 
+def unsubscribe_url(email):
+    return f"{BLOG_URL}/.netlify/functions/unsubscribe?email={urllib.parse.quote(email)}"
+
+
 def send_email(to, subject, text_body, html_body=None):
+    unsub_url = unsubscribe_url(to)
     payload = {
         "from": FROM_EMAIL,
         "to": [to],
         "subject": subject,
-        "text": text_body,
+        "text": text_body.replace("{{UNSUBSCRIBE_URL}}", unsub_url),
         "headers": {
-            "List-Unsubscribe": f"<{BLOG_URL}/unsubscribe>",
+            "List-Unsubscribe": f"<{unsub_url}>",
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
         },
     }
     if html_body:
-        payload["html"] = html_body
+        payload["html"] = html_body.replace("{{UNSUBSCRIBE_URL}}", unsub_url)
     resend_api("POST", "/emails", payload)
 
 
@@ -99,7 +106,7 @@ def build_html_email(title, url, html_content):
         f"<p style=\"font-size:0.9em;color:#666;\">"
         f"You're receiving this because you subscribed at "
         f'<a href="{BLOG_URL}">{BLOG_URL}</a>.<br>'
-        f'<a href="{{{{RESEND_UNSUBSCRIBE_URL}}}}">Unsubscribe</a></p>'
+        f'<a href="{{{{UNSUBSCRIBE_URL}}}}">Unsubscribe</a></p>'
     )
     return (
         f"<h1>{title}</h1>\n"
@@ -158,7 +165,7 @@ def main():
         text_body += f"Read more: {url}\n"
         text_body += f"\n---\n"
         text_body += f"You're receiving this because you subscribed at {BLOG_URL}.\n"
-        text_body += f"To unsubscribe: {{{{RESEND_UNSUBSCRIBE_URL}}}}"
+        text_body += "To unsubscribe: {{UNSUBSCRIBE_URL}}"
 
         html_body = None
         if html_content:
