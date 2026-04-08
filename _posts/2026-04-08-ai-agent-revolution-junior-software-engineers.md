@@ -2,7 +2,7 @@
 layout: post
 title: Northeastern presentation to junior engineers in the age of AI
 subtitle: "An AI agent revolution is afoot: How can the next generation of software engineers thrive?"
-date: 2026-04-07
+date: 2026-04-08
 ---
 Late last year, my grad school colleague [Chen-Hsiang (Jones) Yu](https://www.linkedin.com/in/chen-hsiang-jones-yu-7007a38/){:target="_blank"} invited me to give a talk to students at Northeastern University in his Software Engineering classes. I've posted the [full slides of the talk here](https://marcua.net/presentations/northeastern-ai-agent-revolution-2025.pdf){:target="_blank"}. If I could pick only one slide to represent the talk, it's this one:
 
