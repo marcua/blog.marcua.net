@@ -1,2 +1,13 @@
+[build]
+  # Install uv (used by _plugins/og_image.rb to run generate_og_images.py),
+  # then build via Bundler so Jekyll resolves from the Gemfile rather than
+  # relying on a globally-installed binary.
+  command = "curl -LsSf https://astral.sh/uv/install.sh | sh && export PATH=\"$HOME/.local/bin:$PATH\" && bundle exec jekyll build"
+  publish = "_site"
+
+[build.environment]
+  RUBY_VERSION = "3.4.9"
+  JEKYLL_ENV = "production"
+
 [functions]
   directory = "netlify/functions"

@@ -33,6 +33,11 @@ BODY_COLOR = "#b0b0b0"
 ACCENT_COLOR = "#7eb8da"
 MUTED_COLOR = "#808080"
 
+# Sentinel that brackets link text through extraction, wrapping, and drawing,
+# so the body draw loop can re-color those runs in ACCENT_COLOR. Using a
+# control char (U+0001) so it can't collide with real post content.
+LINK_MARKER = "\x01"
+
 def _find_font(candidates):
     """Return the first font path that exists, or fall back to Pillow default."""
     for path in candidates:
@@ -74,10 +79,23 @@ def parse_post(filepath):
 
 def extract_paragraphs(body, max_chars=500):
     """Extract the first few paragraphs of plain text from markdown body."""
+    # Drop markdown table rows entirely (header, separator, body). Tables in
+    # this blog are mostly image-with-caption layouts and have no useful plain
+    # text representation in an OG preview.
+    body = re.sub(r"^[ \t]*\|.*$", "", body, flags=re.MULTILINE)
     # Remove markdown headings
     body = re.sub(r"^#{1,6}\s+.*$", "", body, flags=re.MULTILINE)
-    # Remove markdown links, keep link text
-    body = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", body)
+    # Wrap link text in sentinel markers (drawn later in ACCENT_COLOR) and
+    # drop the URL.
+    body = re.sub(
+        r"\[([^\]]+)\]\([^)]+\)",
+        lambda m: f"{LINK_MARKER}{m.group(1)}{LINK_MARKER}",
+        body,
+    )
+    # Strip Kramdown inline attribute lists: {:target="_blank"}, {:.class}, etc.
+    # Run this after link handling so orphaned IALs left behind by
+    # `[text](url){:foo}` get cleaned up.
+    body = re.sub(r"\{:[^}]*\}", "", body)
     # Remove bold/italic markers
     body = re.sub(r"\*{1,3}([^*]+)\*{1,3}", r"\1", body)
     # Remove images
@@ -96,13 +114,14 @@ def extract_paragraphs(body, max_chars=500):
     for p in paragraphs:
         # Collapse internal whitespace
         p = " ".join(p.split())
-        if total + len(p) > max_chars:
-            # Take a partial paragraph if we haven't added anything yet
+        # Count visible chars only — link markers shouldn't eat the budget.
+        visible_len = len(p.replace(LINK_MARKER, ""))
+        if total + visible_len > max_chars:
             if not result:
                 result.append(p[:max_chars] + "...")
             break
         result.append(p)
-        total += len(p)
+        total += visible_len
 
     return "\n\n".join(result)
 
@@ -115,13 +134,19 @@ def slug_from_filename(filepath):
 
 
 def wrap_text(draw, text, font, max_width):
-    """Word-wrap text to fit within max_width pixels."""
+    """Word-wrap text to fit within max_width pixels.
+
+    Link markers are preserved in the returned lines but stripped when
+    measuring widths so they don't perturb wrapping.
+    """
     words = text.split()
     lines = []
     current_line = []
     for word in words:
         test_line = " ".join(current_line + [word])
-        bbox = draw.textbbox((0, 0), test_line, font=font)
+        bbox = draw.textbbox(
+            (0, 0), test_line.replace(LINK_MARKER, ""), font=font
+        )
         if bbox[2] > max_width and current_line:
             lines.append(" ".join(current_line))
             current_line = [word]
@@ -130,6 +155,38 @@ def wrap_text(draw, text, font, max_width):
     if current_line:
         lines.append(" ".join(current_line))
     return lines
+
+
+def normalize_link_markers(lines):
+    """Re-balance link markers across line breaks within a paragraph.
+
+    If a link wraps across lines, the closing marker lives on a later line
+    than the opening marker. This rewrites each line so it independently
+    opens and closes its link runs based on the running state.
+    """
+    result = []
+    in_link = False
+    for line in lines:
+        new_line = LINK_MARKER if in_link else ""
+        for ch in line:
+            new_line += ch
+            if ch == LINK_MARKER:
+                in_link = not in_link
+        if in_link:
+            new_line += LINK_MARKER
+        result.append(new_line)
+    return result
+
+
+def draw_styled_line(draw, line, x, y, font, body_color, link_color):
+    """Draw a single line, alternating colors at link-marker boundaries."""
+    in_link = False
+    for run in line.split(LINK_MARKER):
+        if run:
+            color = link_color if in_link else body_color
+            draw.text((x, y), run, font=font, fill=color)
+            x += draw.textbbox((0, 0), run, font=font)[2]
+        in_link = not in_link
 
 
 def generate_og_image(frontmatter, body, output_path):
@@ -210,14 +267,18 @@ def generate_og_image(frontmatter, body, output_path):
     max_body_y = HEIGHT - 50  # leave some bottom margin
     paragraphs = body_text.split("\n\n")
     for para in paragraphs:
-        lines = wrap_text(draw, para, font_body, max_text_width)
+        lines = normalize_link_markers(
+            wrap_text(draw, para, font_body, max_text_width)
+        )
         for line in lines:
             if y + 24 > max_body_y:
                 # Add ellipsis if we run out of room
                 draw.text((margin_x, y), "...", font=font_body, fill=BODY_COLOR)
                 y = max_body_y
                 break
-            draw.text((margin_x, y), line, font=font_body, fill=BODY_COLOR)
+            draw_styled_line(
+                draw, line, margin_x, y, font_body, BODY_COLOR, ACCENT_COLOR
+            )
             y += 24
         if y >= max_body_y:
             break
