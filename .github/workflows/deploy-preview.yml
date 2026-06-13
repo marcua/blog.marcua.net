@@ -93,7 +93,11 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           # Build under the preview subpath so all asset/link URLs resolve
           # correctly when served from marcua.net/blog/_staging/<branch>.
+          # _config_preview.yml sets noindex: true, which emits a noindex
+          # meta tag (via _includes/custom-head.html) so previews stay out
+          # of search indexes.
           bundle exec jekyll build \
+            --config _config.yml,_config_preview.yml \
             --baseurl "/blog/_staging/${{ steps.deploy-path.outputs.staging_name }}"
 
       - name: Rsync to server
