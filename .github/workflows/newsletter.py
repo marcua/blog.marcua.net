@@ -160,7 +160,7 @@ def main():
     # 5. Send emails
     for title, url, pub_dt, summary, html_content in new_posts:
         text_body = f"{title}\n\n"
-        if summary:
+        if summary and len(summary) <= 200:
             text_body += f"{summary}\n\n"
         text_body += f"Read more: {url}\n"
         text_body += f"\n---\n"
