@@ -99,8 +99,11 @@ def send_email(to, subject, text_body, html_body=None):
     resend_api("POST", "/emails", payload)
 
 
-def build_html_email(title, url, html_content):
+def build_html_email(title, url, summary, html_content):
     """Wrap post HTML content in a minimal email-safe wrapper."""
+    subtitle_html = ""
+    if summary and not html_content.lstrip().lower().startswith(summary[:40].lower()):
+        subtitle_html = f'<p style="color:#555;font-style:italic;">{summary}</p>\n'
     footer = (
         f'<hr style="margin-top:2em;border:none;border-top:1px solid #ccc;">'
         f"<p style=\"font-size:0.9em;color:#666;\">"
@@ -110,6 +113,7 @@ def build_html_email(title, url, html_content):
     )
     return (
         f"<h1>{title}</h1>\n"
+        f"{subtitle_html}"
         f"{html_content}\n"
         f'<p><a href="{url}">View on blog</a></p>\n'
         f"{footer}"
@@ -169,7 +173,7 @@ def main():
 
         html_body = None
         if html_content:
-            html_body = build_html_email(title, url, html_content)
+            html_body = build_html_email(title, url, summary, html_content)
 
         for email in subscribers:
             print(f"  Sending '{title}' to {email}")
