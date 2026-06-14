@@ -1,0 +1,5 @@
+# Overlay config used only by the branch-preview build in
+# .github/workflows/deploy-preview.yml (layered after _config.yml).
+# Marks preview deploys so they emit a noindex meta tag and never get
+# indexed by search engines. Production builds (Netlify) don't load this.
+noindex: true

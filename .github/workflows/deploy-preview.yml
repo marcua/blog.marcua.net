@@ -1,0 +1,196 @@
+name: Deploy branch preview
+
+# Production (blog.marcua.net) is deployed by Netlify from `main`.
+# This workflow only builds and deploys *preview* sites for non-main
+# branches under a `blog` prefix. Previews are served at:
+#   https://marcua.net/blog/_staging/<sanitized-branch>
+on:
+  push:
+    branches-ignore:
+      - main
+  delete:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    # Build/deploy on pushes to non-main branches, and clean up on branch
+    # deletes. Never touch main (Netlify owns production). PR events are
+    # handled by the comment-on-pr job below.
+    if: github.event_name != 'pull_request' && (github.event_name != 'delete' || github.event.ref != 'main')
+
+    steps:
+      - name: Checkout repository
+        if: github.event_name != 'delete'
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+          # Configure SSH to use this key for the host
+          cat >> ~/.ssh/config << EOF
+          Host ${{ secrets.SSH_HOST }}
+            IdentityFile ~/.ssh/deploy_key
+            User ${{ secrets.SSH_USER }}
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Determine deployment path
+        id: deploy-path
+        run: |
+          if [ "${{ github.event_name }}" = "delete" ]; then
+            # Branch deletion event
+            BRANCH_NAME="${{ github.event.ref }}"
+            SANITIZED_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9._-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+            echo "action=delete" >> $GITHUB_OUTPUT
+            echo "path=${{ secrets.DEPLOY_BASE_PATH }}/blog/_staging/${SANITIZED_BRANCH}" >> $GITHUB_OUTPUT
+            echo "staging_name=${SANITIZED_BRANCH}" >> $GITHUB_OUTPUT
+          else
+            # Non-main branch push - deploy a preview
+            BRANCH_NAME="${{ github.ref_name }}"
+            SANITIZED_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9._-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+            echo "action=deploy" >> $GITHUB_OUTPUT
+            echo "path=${{ secrets.DEPLOY_BASE_PATH }}/blog/_staging/${SANITIZED_BRANCH}" >> $GITHUB_OUTPUT
+            echo "staging_name=${SANITIZED_BRANCH}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Delete staging directory (branch deletion)
+        if: steps.deploy-path.outputs.action == 'delete'
+        run: |
+          ssh ${{ secrets.SSH_HOST }} "rm -rf '${{ steps.deploy-path.outputs.path }}'"
+
+          echo "## 🗑️ Preview deleted" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Branch \`${{ github.event.ref }}\` was deleted." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Preview directory \`${{ steps.deploy-path.outputs.staging_name }}\` has been removed from the server." >> $GITHUB_STEP_SUMMARY
+
+      - name: Set up Ruby
+        if: steps.deploy-path.outputs.action == 'deploy'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.9'
+          bundler-cache: true
+
+      - name: Install uv
+        if: steps.deploy-path.outputs.action == 'deploy'
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Build site (preview)
+        if: steps.deploy-path.outputs.action == 'deploy'
+        env:
+          JEKYLL_ENV: production
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          # Build under the preview subpath so all asset/link URLs resolve
+          # correctly when served from marcua.net/blog/_staging/<branch>.
+          # _config_preview.yml sets noindex: true, which emits a noindex
+          # meta tag (via _includes/custom-head.html) so previews stay out
+          # of search indexes.
+          bundle exec jekyll build \
+            --config _config.yml,_config_preview.yml \
+            --baseurl "/blog/_staging/${{ steps.deploy-path.outputs.staging_name }}"
+
+      - name: Rsync to server
+        if: steps.deploy-path.outputs.action == 'deploy'
+        run: |
+          ssh ${{ secrets.SSH_HOST }} "mkdir -p '${{ steps.deploy-path.outputs.path }}'"
+          rsync -avz --delete _site/ "${{ secrets.SSH_HOST }}:${{ steps.deploy-path.outputs.path }}/"
+
+      - name: Print deployment info
+        if: steps.deploy-path.outputs.action == 'deploy'
+        run: |
+          echo "## 🚀 Preview deployed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Preview build from \`${{ github.ref_name }}\` branch." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "View at: https://marcua.net/blog/_staging/${{ steps.deploy-path.outputs.staging_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment on PR with preview URL
+        if: steps.deploy-path.outputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Find PR for this branch
+          PR_NUMBER=$(gh pr list --head "${{ github.ref_name }}" --json number --jq '.[0].number')
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR found for branch ${{ github.ref_name }}, skipping comment"
+            exit 0
+          fi
+
+          DEPLOY_URL="https://marcua.net/blog/_staging/${{ steps.deploy-path.outputs.staging_name }}"
+          COMMENT_MARKER="<!-- preview-deploy-comment -->"
+          COMMENT_BODY="${COMMENT_MARKER}
+          🚀 **Preview deployment ready!**
+
+          $DEPLOY_URL
+
+          _Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC') • Commit: ${{ github.sha }}_"
+
+          # Check for existing comment with our marker
+          EXISTING_COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq ".[] | select(.body | startswith(\"${COMMENT_MARKER}\")) | .id" | head -1)
+
+          if [ -n "$EXISTING_COMMENT_ID" ]; then
+            # Update existing comment
+            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING_COMMENT_ID}" \
+              -X PATCH -f body="$COMMENT_BODY"
+            echo "Updated existing comment"
+          else
+            # Create new comment
+            gh pr comment "$PR_NUMBER" --body "$COMMENT_BODY"
+            echo "Created new comment"
+          fi
+
+  # Separate job for commenting on PR creation (the preview deploy already
+  # happened on push, this just surfaces the URL on the PR).
+  comment-on-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Comment on PR with preview URL
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          SANITIZED_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9._-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+
+          DEPLOY_URL="https://marcua.net/blog/_staging/${SANITIZED_BRANCH}"
+          COMMENT_MARKER="<!-- preview-deploy-comment -->"
+          COMMENT_BODY="${COMMENT_MARKER}
+          🚀 **Preview deployment ready!**
+
+          $DEPLOY_URL
+
+          _Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC') • Commit: ${{ github.event.pull_request.head.sha }}_"
+
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          # Check for existing comment with our marker
+          EXISTING_COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq ".[] | select(.body | startswith(\"${COMMENT_MARKER}\")) | .id" | head -1)
+
+          if [ -n "$EXISTING_COMMENT_ID" ]; then
+            # Update existing comment
+            gh api "repos/${{ github.repository }}/issues/comments/${EXISTING_COMMENT_ID}" \
+              -X PATCH -f body="$COMMENT_BODY"
+            echo "Updated existing comment"
+          else
+            # Create new comment
+            gh pr comment "$PR_NUMBER" --body "$COMMENT_BODY"
+            echo "Created new comment"
+          fi
