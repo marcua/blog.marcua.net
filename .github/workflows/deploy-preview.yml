@@ -2,8 +2,7 @@ name: Deploy branch preview
 
 # Production (blog.marcua.net) is deployed by Netlify from `main`.
 # This workflow only builds and deploys *preview* sites for non-main
-# branches, mirroring the staging-preview setup in marcua/minitools but
-# with a `blog` prefix. Previews are served at:
+# branches under a `blog` prefix. Previews are served at:
 #   https://marcua.net/blog/_staging/<sanitized-branch>
 on:
   push:
