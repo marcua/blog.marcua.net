@@ -8,11 +8,20 @@ on:
 permissions:
   contents: write
 
+# Never let a scheduled run overlap a manual dispatch (or another schedule);
+# overlapping runs would each read the same state and double-send.
+concurrency:
+  group: newsletter
+  cancel-in-progress: false
+
 jobs:
   send:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so the script can rebase/push the state file cleanly.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -20,16 +29,17 @@ jobs:
 
       - name: Send newsletter
         env:
+          PYTHONUNBUFFERED: "1"
           BLOG_URL: ${{ secrets.BLOG_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID }}
           FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
         run: python .github/workflows/newsletter.py
 
-      - name: Commit last_sent
+      - name: Backstop push state
+        # The script checkpoints/pushes per post; this catches a state commit
+        # that was made locally but not pushed (e.g. a late failure).
+        if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .last_sent
-          git diff --staged --quiet || git commit -m "chore: update newsletter last_sent [skip ci]"
-          git push
+          git pull --rebase --autostash origin "$GITHUB_REF_NAME" || true
+          git push origin "HEAD:$GITHUB_REF_NAME" || true
