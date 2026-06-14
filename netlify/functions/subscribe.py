@@ -1,6 +1,6 @@
 import json
 import os
-import re
+import urllib.parse
 import urllib.request
 import urllib.error
 
@@ -70,16 +70,24 @@ def handler(event, context):
         })
 
         # Send confirmation email
+        unsub_url = (
+            f"{BLOG_URL}/.netlify/functions/unsubscribe"
+            f"?email={urllib.parse.quote(email)}"
+        )
         resend_request("/emails", {
             "from": FROM_EMAIL,
             "to": [email],
             "subject": f"You're subscribed to {BLOG_NAME}",
             "text": (
-                f"Thanks for subscribing! You'll get an email whenever "
+                f"Thank you for subscribing! You'll get an email whenever "
                 f"I publish a new post.\n\n"
                 f"Visit the blog: {BLOG_URL}\n\n"
-                f"— Adam"
+                f"To unsubscribe: {unsub_url}"
             ),
+            "headers": {
+                "List-Unsubscribe": f"<{unsub_url}>",
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
         })
 
         return {

@@ -11,19 +11,12 @@ Delivery safety
 ---------------
 * Each ``POST /emails`` carries a deterministic ``Idempotency-Key`` derived from
   ``(post_id, recipient)``. Resend dedupes identical keys server-side for ~24h,
-  so a retry within a day re-sends only the recipients that didn't already get it.
-* State is checkpointed (written + committed + pushed) after each post that sends
-  cleanly, so a mid-run failure can't force a wholesale re-send of earlier posts.
-* A post is only checkpointed when every recipient succeeded. If any send fails,
-  the post is left unrecorded and the run exits non-zero; the next run retries it,
-  with idempotency keys neutralizing the already-delivered recipients.
-
-Cold start
-----------
-On the very first run (no state file), every post currently in the feed is
-recorded as "already sent" and no email goes out, so the back-catalog is never
-emailed. A seed file is also committed to the repo up front for the same reason;
-the cold-start branch is a defensive net in case the state file ever goes missing.
+  so a retry within a day is a no-op for already-delivered recipients.
+* A post is always recorded as sent after sending, even if some recipients fail.
+  This prevents the scenario where a persistently-failing address causes every
+  other subscriber to receive the email again after the 24h idempotency window.
+  Failed recipients are logged for observability but do not block forward progress.
+* State is checkpointed (written + committed + pushed) after each post.
 """
 
 import hashlib
@@ -31,7 +24,6 @@ import json
 import os
 import re
 import subprocess
-import sys
 import time
 import urllib.error
 import urllib.parse
@@ -49,9 +41,7 @@ STATE_PATH = REPO_ROOT / ".sent_posts.json"
 
 ATOM_NS = {"atom": "http://www.w3.org/2005/Atom"}
 
-# Resend free tier allows 2 requests/second.
-RATE_LIMIT_SECONDS = 0.5
-# Network push retries use exponential backoff starting here.
+RATE_LIMIT_SECONDS = 0.6
 PUSH_RETRY_BASE_SECONDS = 2
 PUSH_RETRIES = 4
 
@@ -76,7 +66,8 @@ def resend_api(method, path, payload=None, extra_headers=None):
 
 def get_subscribers():
     """Return all non-unsubscribed contact emails, following pagination."""
-    emails = []
+    seen = set()
+    subscribers = []
     after = None
     while True:
         path = f"/audiences/{RESEND_AUDIENCE_ID}/contacts?limit=100"
@@ -86,20 +77,16 @@ def get_subscribers():
         page = result.get("data", [])
         for contact in page:
             if not contact.get("unsubscribed", False):
-                emails.append(contact["email"])
+                email = contact["email"]
+                if email not in seen:
+                    seen.add(email)
+                    subscribers.append(email)
         if not page or not result.get("has_more"):
             break
         after = page[-1].get("id")
         if not after:
             break
-    # De-dupe while preserving order, in case the same email appears twice.
-    seen = set()
-    unique = []
-    for email in emails:
-        if email not in seen:
-            seen.add(email)
-            unique.append(email)
-    return unique
+    return subscribers
 
 
 def idempotency_key(post_id, email):
@@ -135,8 +122,6 @@ def send_email(to, subject, text_body, html_body, post_id):
         )
     except urllib.error.HTTPError as exc:
         if exc.code == 409:
-            # Same idempotency key already in-flight or completed with the same
-            # payload -> the email is already (being) sent. Treat as success.
             print(f"    idempotent no-op for {to} (409)")
             return
         raise
@@ -146,7 +131,12 @@ def send_email(to, subject, text_body, html_body, post_id):
 # Feed parsing
 # --------------------------------------------------------------------------- #
 def parse_feed(xml_text):
-    """Return a list of post dicts: id, title, url, published, summary, html."""
+    """Return a list of post dicts: id, title, url, published, summary, html.
+
+    Post IDs are the stable <id> URIs from the Atom feed, e.g.
+    ``https://blog.marcua.net/2026/05/05/figmimic`` — the same format used
+    as keys in .sent_posts.json.
+    """
     root = ET.fromstring(xml_text)
     posts = []
     for entry in root.findall("atom:entry", ATOM_NS):
@@ -212,8 +202,6 @@ def build_html_email(title, url, summary, html_content):
 
 def build_text_email(post):
     body = f"{post['title']}\n\n"
-    # Posts without a subtitle fall back to the full first paragraph as the feed
-    # summary, which reads poorly in plain text; only include short summaries.
     if post["summary"] and len(post["summary"]) <= 200:
         body += f"{post['summary']}\n\n"
     body += f"Read more: {post['url']}\n"
@@ -227,9 +215,10 @@ def build_text_email(post):
 # State persistence
 # --------------------------------------------------------------------------- #
 def load_state():
-    """Return the set of already-sent post ids, or None if there's no state."""
     if not STATE_PATH.exists():
-        return None
+        raise FileNotFoundError(
+            f"{STATE_PATH} not found. Commit a seed .sent_posts.json to the repo."
+        )
     data = json.loads(STATE_PATH.read_text())
     return set(data.get("sent", []))
 
@@ -258,7 +247,7 @@ def commit_state(message):
     ).stdout.strip()
     _git("add", str(STATE_PATH))
     if _git("diff", "--staged", "--quiet", check=False).returncode == 0:
-        return  # nothing to commit
+        return
     _git(
         "-c",
         "user.name=github-actions[bot]",
@@ -271,7 +260,8 @@ def commit_state(message):
     delay = PUSH_RETRY_BASE_SECONDS
     last_err = ""
     for attempt in range(1, PUSH_RETRIES + 1):
-        _git("pull", "--rebase", "--autostash", "origin", branch, check=False)
+        # Merge (not rebase) so a normal push always works without --force.
+        _git("pull", "--no-rebase", "--autostash", "origin", branch, check=False)
         push = _git("push", "origin", f"HEAD:{branch}", check=False)
         if push.returncode == 0:
             return
@@ -300,16 +290,6 @@ def main():
         return
 
     state = load_state()
-    if state is None:
-        # Cold start: record every current post as sent so we never email the
-        # back-catalog, and send nothing this run.
-        seed = {post["id"] for post in posts}
-        save_state(seed)
-        commit_state(
-            f"chore: seed newsletter state with {len(seed)} existing post(s)"
-        )
-        print(f"Cold start: seeded {len(seed)} existing post(s); no emails sent.")
-        return
 
     new_posts = [post for post in posts if post["id"] not in state]
     new_posts.sort(key=lambda post: post["published"])  # oldest first
@@ -332,32 +312,25 @@ def main():
             else None
         )
 
-        sent = 0
+        sent_count = 0
         failed = []
         for email in subscribers:
             try:
                 send_email(email, post["title"], text_body, html_body, post["id"])
-                sent += 1
-            except Exception as exc:  # noqa: BLE001 - log and keep going
+                sent_count += 1
+            except Exception as exc:
                 failed.append(email)
                 print(f"    ERROR sending to {email}: {exc}")
             time.sleep(RATE_LIMIT_SECONDS)
 
-        summary = f"  '{post['title']}': sent {sent}/{len(subscribers)}"
+        result_msg = f"  '{post['title']}': sent {sent_count}/{len(subscribers)}"
         if failed:
-            summary += f", {len(failed)} failed"
-        print(summary)
+            result_msg += f", {len(failed)} failed: {failed}"
+        print(result_msg)
 
-        if failed:
-            # Leave this post unrecorded so the next run retries it. Idempotency
-            # keys make that retry a no-op for recipients already delivered
-            # (within Resend's ~24h window). Stop here so we don't send newer
-            # posts ahead of an older one that isn't fully delivered.
-            sys.exit(
-                f"{len(failed)} send(s) failed for '{post['title']}'; "
-                f"state not advanced for it. Will retry next run."
-            )
-
+        # Always record the post as sent. Failed recipients are logged but don't
+        # block progress — this prevents the scenario where a persistently-failing
+        # address causes everyone else to get duplicates after idempotency expires.
         state.add(post["id"])
         save_state(state)
         commit_state(f"chore: record newsletter send for {post['id']}")
