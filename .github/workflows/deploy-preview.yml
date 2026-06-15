@@ -95,7 +95,10 @@ jobs:
           # _config_preview.yml sets noindex: true, which emits a noindex
           # meta tag (via _includes/custom-head.html) so previews stay out
           # of search indexes.
+          # --future includes posts with a future date so scheduled posts are
+          # visible in staging previews before their publish date.
           bundle exec jekyll build \
+            --future \
             --config _config.yml,_config_preview.yml \
             --baseurl "/blog/_staging/${{ steps.deploy-path.outputs.staging_name }}"
 
