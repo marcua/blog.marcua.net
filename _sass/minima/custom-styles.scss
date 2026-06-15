@@ -1,3 +1,47 @@
+// Self-hosted fonts (IBM Plex Sans body / IBM Plex Mono headings).
+// Paths are relative to the compiled CSS at /assets/css/style.css.
+// Sans is a single variable file covering the full weight range.
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-sans-var.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: italic;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-sans-var-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-mono-600.woff2") format("woff2");
+}
+
+// Headings, post title, and the masthead use IBM Plex Mono for a technical,
+// terminal-adjacent personality that ties to the coding-agents subject matter.
+h1, h2, h3, h4, h5, h6,
+.post-title,
+.site-title {
+  font-family: $heading-font-family;
+  // Monospace space glyphs are full-width, so multi-word titles read gappy.
+  // Pull the inter-word gaps in slightly (this is NOT justification — the
+  // listing is ragged left-aligned; it's just the nature of a mono space).
+  word-spacing: -0.12em;
+}
+
 // Custom styles for post headers
 .post-header {
   text-align: left !important;
@@ -12,10 +56,21 @@
   .post-meta {
     text-align: left !important;
     color: #c8c8c8;
+    font-family: $heading-font-family;
+    font-size: 0.85rem;
+  }
+
+  // Mono runs wide, so the default 2.625rem title reads oversized. Pull it
+  // down a notch; negative tracking and a tighter line height keep it confident.
+  .post-title {
+    font-size: 2.1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 
   .post-subtitle {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     color: #c8c8c8;
     margin-top: -0.5rem;
     margin-bottom: 1rem;
@@ -50,12 +105,26 @@
   height: 36px;
 }
 
+// Bold text should read as emphasis: brighter than the body color so the
+// weight change is reinforced by contrast (on dark, weight alone is subtle).
+strong, b {
+  color: #ffffff;
+  font-weight: 700;
+}
+
 // Post content typography improvements
 .post-content {
-  max-width: 680px;
-  letter-spacing: 0.02em;
+  // Width comes from $content-width (the shared wrapper) so the body lines up
+  // with the masthead and footer; no separate cap here.
+  // IBM Plex Sans has well-drawn native spacing; no added tracking on body.
+  letter-spacing: 0;
+  // Slightly tighter leading to suit Plex Sans's tall x-height.
+  line-height: 1.6;
+  // Light text blooms slightly on a dark background, which thins 400-weight
+  // type; a small bump (Plex Sans is variable) restores presence without bolding.
+  font-weight: 440;
 
-  h3 {
+  h1, h2, h3 {
     font-weight: 600;
   }
 
