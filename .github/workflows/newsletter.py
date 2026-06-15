@@ -122,7 +122,7 @@ def send_email(to, subject, text_body, html_body, post_id):
         )
     except urllib.error.HTTPError as exc:
         if exc.code == 409:
-            print(f"    idempotent no-op for {to} (409)")
+            print("    idempotent no-op (409)")
             return
         raise
 
@@ -320,12 +320,12 @@ def main():
                 sent_count += 1
             except Exception as exc:
                 failed.append(email)
-                print(f"    ERROR sending to {email}: {exc}")
+                print(f"    ERROR sending to a subscriber: {exc}")
             time.sleep(RATE_LIMIT_SECONDS)
 
         result_msg = f"  '{post['title']}': sent {sent_count}/{len(subscribers)}"
         if failed:
-            result_msg += f", {len(failed)} failed: {failed}"
+            result_msg += f", {len(failed)} failed"
         print(result_msg)
 
         # Always record the post as sent. Failed recipients are logged but don't
