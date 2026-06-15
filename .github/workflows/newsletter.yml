@@ -34,6 +34,7 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID }}
           FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         run: python .github/workflows/newsletter.py
 
       - name: Backstop push state

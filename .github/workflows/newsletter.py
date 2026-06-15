@@ -35,6 +35,7 @@ BLOG_URL = os.environ["BLOG_URL"]
 RESEND_API_KEY = os.environ["RESEND_API_KEY"]
 RESEND_AUDIENCE_ID = os.environ["RESEND_AUDIENCE_ID"]
 FROM_EMAIL = os.environ["FROM_EMAIL"]
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 STATE_PATH = REPO_ROOT / ".sent_posts.json"
@@ -304,6 +305,7 @@ def main():
         return
     print(f"Sending to {len(subscribers)} subscriber(s).")
 
+    run_results = []
     for post in new_posts:
         text_body = build_text_email(post)
         html_body = (
@@ -323,6 +325,13 @@ def main():
                 print(f"    ERROR sending to a subscriber: {exc}")
             time.sleep(RATE_LIMIT_SECONDS)
 
+        run_results.append({
+            "title": post["title"],
+            "sent": sent_count,
+            "total": len(subscribers),
+            "failed": failed,
+        })
+
         result_msg = f"  '{post['title']}': sent {sent_count}/{len(subscribers)}"
         if failed:
             result_msg += f", {len(failed)} failed"
@@ -334,6 +343,38 @@ def main():
         state.add(post["id"])
         save_state(state)
         commit_state(f"chore: record newsletter send for {post['id']}")
+
+    send_admin_summary(run_results)
+
+
+def send_admin_summary(run_results):
+    """Email the admin a summary of the run with failure details."""
+    if not ADMIN_EMAIL or not run_results:
+        return
+    total_sent = sum(r["sent"] for r in run_results)
+    total_failed = sum(len(r["failed"]) for r in run_results)
+    total_recipients = sum(r["total"] for r in run_results)
+
+    lines = [f"Newsletter run complete: {len(run_results)} post(s) processed.\n"]
+    for r in run_results:
+        lines.append(f"- {r['title']}: {r['sent']}/{r['total']} delivered")
+        if r["failed"]:
+            lines.append(f"  Failed addresses:")
+            for addr in r["failed"]:
+                lines.append(f"    {addr}")
+    lines.append(f"\nTotal: {total_sent} sent, {total_failed} failed across {total_recipients} recipient(s).")
+
+    subject = f"Newsletter: {total_sent} sent"
+    if total_failed:
+        subject += f", {total_failed} failed"
+
+    resend_api("POST", "/emails", {
+        "from": FROM_EMAIL,
+        "to": [ADMIN_EMAIL],
+        "subject": subject,
+        "text": "\n".join(lines),
+    })
+    print(f"Admin summary sent to {ADMIN_EMAIL}.")
 
 
 if __name__ == "__main__":
