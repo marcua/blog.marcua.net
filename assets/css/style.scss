@@ -3,4 +3,6 @@
 
 @import "minima/skins/{{ site.minima.skin | default: 'classic' }}";
 @import "minima/initialize";
-@import "minima/custom-styles";
+// Note: custom-variables and custom-styles are already imported by
+// "minima/initialize"; don't re-import custom-styles here or every override
+// rule compiles twice.
