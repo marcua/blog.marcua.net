@@ -1,7 +1,20 @@
 // Typography improvements for dark mode readability
 
-// Brighter body text (from #959595)
-$text-color: #c8c8c8;
+// Self-hosted IBM Plex Sans for body; IBM Plex Mono for headings (see custom-styles.scss)
+$base-font-family: "IBM Plex Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+$heading-font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+// One site-wide column width so the masthead, post header, body, and footer
+// all share the same measure and line up (the .wrapper is content-box, so the
+// text column equals $content-width). ~640px ≈ 70 characters at 17px Plex Sans.
+$content-width: 640px;
+
+// Brighter body text (from #959595, then #c8c8c8) for a touch more contrast
+$text-color: #d4d4d4;
+
+// Headings brighter than body so the hierarchy reads correctly
+// (the dark skin's default #bbbbbb was dimmer than the body text)
+$heading-color: #f0f0f0;
 
 // Increased line height for readability (from 1.5)
 $base-line-height: 1.7;
