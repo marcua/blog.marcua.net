@@ -37,7 +37,7 @@ RESEND_AUDIENCE_ID = os.environ["RESEND_AUDIENCE_ID"]
 FROM_EMAIL = os.environ["FROM_EMAIL"]
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[1]
 STATE_PATH = REPO_ROOT / ".sent_posts.json"
 
 ATOM_NS = {"atom": "http://www.w3.org/2005/Atom"}
@@ -374,7 +374,7 @@ def send_admin_summary(run_results):
         "subject": subject,
         "text": "\n".join(lines),
     })
-    print(f"Admin summary sent to {ADMIN_EMAIL}.")
+    print("Admin summary sent.")
 
 
 if __name__ == "__main__":

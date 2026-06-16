@@ -9,7 +9,7 @@ _includes/subscribe-form.html      # signup form (include in any layout)
 _layouts/base.html                  # overrides minima to show form on every page
 netlify/functions/subscribe.py      # Netlify Function: adds contact + sends confirmation
 netlify/functions/unsubscribe.py    # Netlify Function: marks contact unsubscribed
-.github/workflows/newsletter.py    # checks feed, emails subscribers
+newsletter/newsletter.py           # checks feed, emails subscribers
 .github/workflows/newsletter.yml   # cron schedule (every 4h) + workflow_dispatch
 .sent_posts.json                    # tracks which posts have been emailed (committed to repo)
 netlify.toml                        # [functions] directory config (add to existing file)
