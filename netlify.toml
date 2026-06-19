@@ -8,6 +8,3 @@
 [build.environment]
   RUBY_VERSION = "3.4.9"
   JEKYLL_ENV = "production"
-
-[functions]
-  directory = "netlify/functions"
