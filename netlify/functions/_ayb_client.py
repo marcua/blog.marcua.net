@@ -109,13 +109,12 @@ class AybClient:
             "applied_at TEXT DEFAULT CURRENT_TIMESTAMP, "
             "PRIMARY KEY (app_id, version))"
         )
-        result = self.query(
-            f"SELECT MAX(version) FROM _ayb_migrations WHERE app_id = '{app}'"
+        rows = self.rows(
+            f"SELECT MAX(version) as v FROM _ayb_migrations WHERE app_id = '{app}'"
         )
-        rows = result.get("rows", [])
         current = 0
-        if rows and rows[0] and rows[0][0] is not None:
-            current = int(rows[0][0])
+        if rows and rows[0]["v"] is not None:
+            current = int(rows[0]["v"])
         for index in range(current, len(migrations)):
             self.query(migrations[index])
             self.query(

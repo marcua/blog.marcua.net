@@ -6,8 +6,8 @@ import smtplib
 import urllib.parse
 from email.message import EmailMessage
 
-BLOG_NAME = "N=1 (marcua's blog)"
-BLOG_URL = "https://blog.marcua.net"
+BLOG_NAME = os.environ.get("BLOG_NAME", "")
+BLOG_URL = os.environ.get("BLOG_URL", "")
 
 
 def smtp_connection():

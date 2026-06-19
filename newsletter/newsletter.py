@@ -231,7 +231,7 @@ def main():
                 except Exception as exc:
                     failed_emails.append(sub["email"])
                     record_send(client, post["db_id"], sub["id"], "failed", str(exc))
-                    print(f"    ERROR sending to a subscriber: {exc}")
+                    print(f"    ERROR sending to a subscriber: {type(exc).__name__}")
                 time.sleep(RATE_LIMIT_SECONDS)
 
             run_results.append(
