@@ -1,15 +1,23 @@
 import json
-import os
 
-from _ayb import ayb_query, ayb_rows, sql_literal
+from ayb_client import AybClient
+from shared import BLOG_URL
 
-BLOG_URL = "https://blog.marcua.net"
+_client = None
+sql_literal = AybClient.sql_literal
 
 CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
 }
+
+
+def _get_client():
+    global _client
+    if _client is None:
+        _client = AybClient.from_env()
+    return _client
 
 
 def handler(event, context):
@@ -32,7 +40,8 @@ def handler(event, context):
         }
 
     try:
-        rows = ayb_rows(
+        client = _get_client()
+        rows = client.rows(
             f"SELECT id FROM subscribers "
             f"WHERE unsubscribe_token = {sql_literal(token)} "
             f"AND unsubscribed_at IS NULL"
@@ -48,7 +57,7 @@ def handler(event, context):
                 ),
             }
 
-        ayb_query(
+        client.query(
             f"UPDATE subscribers SET unsubscribed_at = CURRENT_TIMESTAMP "
             f"WHERE id = {int(rows[0]['id'])}"
         )

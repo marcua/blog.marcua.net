@@ -1,17 +1,12 @@
-import contextlib
 import json
-import os
 import secrets
-import smtplib
 import urllib.parse
-from email.message import EmailMessage
 
-from _ayb import ayb_query, ayb_rows, sql_literal
+from ayb_client import AybClient
+from shared import BLOG_NAME, BLOG_URL, build_message, send_smtp, unsubscribe_url
 
-FROM_EMAIL = os.environ.get("FROM_EMAIL", "")
-REPLY_TO = os.environ.get("REPLY_TO", "")
-BLOG_NAME = "N=1 (marcua's blog)"
-BLOG_URL = "https://blog.marcua.net"
+_client = None
+sql_literal = AybClient.sql_literal
 
 CORS_HEADERS = {
     "Access-Control-Allow-Origin": "*",
@@ -20,38 +15,11 @@ CORS_HEADERS = {
 }
 
 
-def _send_confirmation(email, unsub_url):
-    host = os.environ["SMTP_HOST"]
-    port = int(os.environ.get("SMTP_PORT", "587"))
-    username = os.environ["SMTP_USERNAME"]
-    password = os.environ["SMTP_PASSWORD"]
-
-    msg = EmailMessage()
-    msg["From"] = FROM_EMAIL
-    msg["To"] = email
-    msg["Subject"] = f"You're subscribed to {BLOG_NAME}"
-    if REPLY_TO:
-        msg["Reply-To"] = REPLY_TO
-    msg["List-Unsubscribe"] = f"<{unsub_url}>"
-    msg["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
-    msg.set_content(
-        f"Thank you for subscribing! You'll get an email whenever "
-        f"I publish a new post.\n\n"
-        f"Visit the blog: {BLOG_URL}\n\n"
-        f"To unsubscribe: {unsub_url}"
-    )
-
-    if port == 465:
-        smtp = smtplib.SMTP_SSL(host, port)
-    else:
-        smtp = smtplib.SMTP(host, port)
-        smtp.starttls()
-    try:
-        smtp.login(username, password)
-        smtp.send_message(msg)
-    finally:
-        with contextlib.suppress(Exception):
-            smtp.quit()
+def _get_client():
+    global _client
+    if _client is None:
+        _client = AybClient.from_env()
+    return _client
 
 
 def handler(event, context):
@@ -83,30 +51,38 @@ def handler(event, context):
         }
 
     try:
+        client = _get_client()
         token = secrets.token_urlsafe(32)
 
-        # Re-subscribe if previously unsubscribed, otherwise insert new.
-        existing = ayb_rows(
+        existing = client.rows(
             f"SELECT id, unsubscribed_at FROM subscribers "
             f"WHERE email = {sql_literal(email)}"
         )
         if existing:
-            ayb_query(
+            client.query(
                 f"UPDATE subscribers SET unsubscribed_at = NULL, "
                 f"unsubscribe_token = {sql_literal(token)} "
                 f"WHERE id = {int(existing[0]['id'])}"
             )
         else:
-            ayb_query(
+            client.query(
                 f"INSERT INTO subscribers (email, unsubscribe_token) "
                 f"VALUES ({sql_literal(email)}, {sql_literal(token)})"
             )
 
-        unsub_url = (
-            f"{BLOG_URL}/.netlify/functions/unsubscribe"
-            f"?token={urllib.parse.quote(token)}"
+        unsub = unsubscribe_url(token)
+        msg = build_message(
+            email,
+            f"You're subscribed to {BLOG_NAME}",
+            (
+                f"Thank you for subscribing! You'll get an email whenever "
+                f"I publish a new post.\n\n"
+                f"Visit the blog: {BLOG_URL}\n\n"
+                f"To unsubscribe: {unsub}"
+            ),
+            list_unsubscribe=unsub,
         )
-        _send_confirmation(email, unsub_url)
+        send_smtp(msg)
 
         return {
             "statusCode": 200,

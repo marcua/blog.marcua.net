@@ -9,19 +9,18 @@ a (post, subscriber) pair with status 'sent' is never emailed again.
 import contextlib
 import os
 import re
-import smtplib
+import sys
 import time
-import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from email.message import EmailMessage
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "netlify" / "functions"))
 
 from ayb_client import AybClient
 from migrations import APP_ID, MIGRATIONS
+from shared import BLOG_URL, build_message, smtp_connection, unsubscribe_url
 
-BLOG_URL = os.environ["BLOG_URL"]
-FROM_EMAIL = os.environ["FROM_EMAIL"]
-REPLY_TO = os.environ.get("REPLY_TO", "")
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
 
 ATOM_NS = {"atom": "http://www.w3.org/2005/Atom"}
@@ -29,52 +28,11 @@ RATE_LIMIT_SECONDS = 0.6
 
 
 # --------------------------------------------------------------------------- #
-# SMTP
-# --------------------------------------------------------------------------- #
-@contextlib.contextmanager
-def smtp_connection():
-    host = os.environ["SMTP_HOST"]
-    port = int(os.environ.get("SMTP_PORT", "587"))
-    username = os.environ["SMTP_USERNAME"]
-    password = os.environ["SMTP_PASSWORD"]
-    if port == 465:
-        smtp = smtplib.SMTP_SSL(host, port)
-    else:
-        smtp = smtplib.SMTP(host, port)
-        smtp.starttls()
-    try:
-        smtp.login(username, password)
-        yield smtp
-    finally:
-        with contextlib.suppress(Exception):
-            smtp.quit()
-
-
-def build_message(to, subject, text_body, html_body=None, list_unsubscribe=None):
-    msg = EmailMessage()
-    msg["From"] = FROM_EMAIL
-    msg["To"] = to
-    msg["Subject"] = subject
-    if REPLY_TO:
-        msg["Reply-To"] = REPLY_TO
-    if list_unsubscribe:
-        msg["List-Unsubscribe"] = f"<{list_unsubscribe}>"
-        msg["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
-    msg.set_content(text_body)
-    if html_body:
-        msg.add_alternative(html_body, subtype="html")
-    return msg
-
-
-def unsubscribe_url(token):
-    return f"{BLOG_URL}/.netlify/functions/unsubscribe?token={urllib.parse.quote(token)}"
-
-
-# --------------------------------------------------------------------------- #
 # Feed parsing + email bodies
 # --------------------------------------------------------------------------- #
 def fetch_feed():
-    feed_url = f"{BLOG_URL}/feed.xml"
+    blog_url = os.environ["BLOG_URL"]
+    feed_url = f"{blog_url}/feed.xml"
     print(f"Fetching {feed_url}")
     with urllib.request.urlopen(urllib.request.Request(feed_url)) as resp:
         return resp.read().decode("utf-8")
@@ -115,16 +73,10 @@ def parse_feed(xml_text):
 
 
 def _normalize_text(value):
-    """Strip HTML tags and collapse whitespace, lowercased, for comparison."""
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", value)).strip().lower()
 
 
 def build_html_email(title, url, summary, html_content):
-    """Wrap post HTML content in a minimal email-safe wrapper.
-
-    Show the summary as a subtitle line only when it isn't just the opening of
-    the post body (i.e. an excerpt-based summary for a post with no subtitle).
-    """
     subtitle_html = ""
     if summary:
         summary_norm = _normalize_text(summary)
@@ -203,7 +155,6 @@ def record_send(client, post_id, subscriber_id, status, error=None):
 # Main
 # --------------------------------------------------------------------------- #
 def send_admin_summary(run_results):
-    """Email the admin a per-post summary, with failed addresses (private)."""
     if not ADMIN_EMAIL or not run_results:
         return
     total_sent = sum(r["sent"] for r in run_results)
@@ -220,8 +171,12 @@ def send_admin_summary(run_results):
     if total_failed:
         subject += f", {total_failed} failed"
 
-    with smtp_connection() as smtp:
-        smtp.send_message(build_message(ADMIN_EMAIL, subject, "\n".join(lines)))
+    conn = smtp_connection()
+    try:
+        conn.send_message(build_message(ADMIN_EMAIL, subject, "\n".join(lines)))
+    finally:
+        with contextlib.suppress(Exception):
+            conn.quit()
     print("Admin summary sent.")
 
 
@@ -245,8 +200,9 @@ def main():
     print(f"{len(subscribers)} active subscriber(s).")
 
     run_results = []
-    with smtp_connection() as smtp:
-        for post in sorted(posts, key=lambda p: p["published"]):  # oldest first
+    conn = smtp_connection()
+    try:
+        for post in sorted(posts, key=lambda p: p["published"]):
             already_sent = already_sent_subscriber_ids(client, post["db_id"])
             recipients = [s for s in subscribers if int(s["id"]) not in already_sent]
             if not recipients:
@@ -269,7 +225,7 @@ def main():
                 )
                 msg = build_message(sub["email"], post["title"], text_body, html_body, unsub)
                 try:
-                    smtp.send_message(msg)
+                    conn.send_message(msg)
                     record_send(client, post["db_id"], sub["id"], "sent")
                     sent_count += 1
                 except Exception as exc:
@@ -290,6 +246,9 @@ def main():
             if failed_emails:
                 line += f", {len(failed_emails)} failed"
             print(line)
+    finally:
+        with contextlib.suppress(Exception):
+            conn.quit()
 
     send_admin_summary(run_results)
 
