@@ -4,19 +4,21 @@ Email subscribers when a new post is published. Subscribers sign up via a form o
 
 Subscriber data lives in an [ayb](https://github.com/marcua/ayb) database. A `sends` table tracks which (post, subscriber) pairs have been emailed, guaranteeing at-most-once delivery per pair.
 
+On cold start (empty `posts` table), the script records all current feed posts without sending, so the back-catalog is never emailed.
+
 ## Files
 
 ```
-newsletter/newsletter.py              # checks feed, emails subscribers via SMTP
-newsletter/ayb_client.py              # ayb HTTP client (query, escaping, migrations)
-newsletter/migrations.py              # schema DDL (subscribers, posts, sends)
-.github/workflows/newsletter.yml      # cron schedule (every 4h) + workflow_dispatch
-netlify/functions/subscribe.py         # Netlify Function: adds subscriber + sends confirmation
-netlify/functions/unsubscribe.py       # Netlify Function: marks subscriber unsubscribed
-netlify/functions/_ayb.py              # shared ayb helper for Netlify functions
-_includes/subscribe-form.html         # signup form (include in any layout)
-_layouts/base.html                     # overrides minima to show form on every page
-netlify.toml                           # [functions] directory config
+newsletter/newsletter.py                # checks feed, emails subscribers via SMTP
+newsletter/migrations.py                # schema DDL (subscribers, posts, sends)
+netlify/functions/subscribe.py           # Netlify Function: adds subscriber + sends confirmation
+netlify/functions/unsubscribe.py         # Netlify Function: marks subscriber unsubscribed
+netlify/functions/_ayb_client.py         # ayb HTTP client (query, escaping, migrations)
+netlify/functions/_shared.py             # shared SMTP, constants, helpers
+_includes/subscribe-form.html           # signup form (include in any layout)
+_layouts/base.html                       # overrides minima to show form on every page
+.github/workflows/newsletter.yml        # cron schedule (every 4h) + workflow_dispatch
+netlify.toml                             # [functions] directory config
 ```
 
 ## Setup
@@ -33,6 +35,7 @@ netlify.toml                           # [functions] directory config
 | Secret | Example |
 |--------|---------|
 | `BLOG_URL` | `https://yourblog.com` |
+| `BLOG_NAME` | `My Blog` |
 | `FROM_EMAIL` | `You <you@yourdomain.com>` |
 | `REPLY_TO` | `you@yourdomain.com` |
 | `ADMIN_EMAIL` | `you@yourdomain.com` |
@@ -44,7 +47,7 @@ netlify.toml                           # [functions] directory config
 | `AYB_TOKEN` | `...` |
 
 ### 4. Netlify Environment Variables (Site settings → Environment variables)
-`FROM_EMAIL`, `REPLY_TO`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `AYB_API_URL`, `AYB_TOKEN`
+`BLOG_URL`, `BLOG_NAME`, `FROM_EMAIL`, `REPLY_TO`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `AYB_API_URL`, `AYB_TOKEN`
 
 ### 5. netlify.toml
 Add to your existing `netlify.toml`:

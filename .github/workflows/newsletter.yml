@@ -25,6 +25,7 @@ jobs:
         env:
           PYTHONUNBUFFERED: "1"
           BLOG_URL: ${{ secrets.BLOG_URL }}
+          BLOG_NAME: ${{ secrets.BLOG_NAME }}
           FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
           REPLY_TO: ${{ secrets.REPLY_TO }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
