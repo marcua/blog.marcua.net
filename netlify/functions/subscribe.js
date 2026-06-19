@@ -2,9 +2,7 @@ const { AybClient } = require("@aybdb/client");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
-// Schema migrations are owned by the GitHub Actions cron job
-// (newsletter/migrations.py). This function assumes the `subscribers`
-// table already exists; run the newsletter workflow at least once first.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function getAybClient() {
   const db = new AybClient({ appId: "newsletter" });
@@ -23,11 +21,6 @@ function getTransporter() {
       pass: process.env.SMTP_PASSWORD,
     },
   });
-}
-
-function unsubscribeUrl(token) {
-  const blogUrl = process.env.BLOG_URL || "";
-  return `${blogUrl}/.netlify/functions/unsubscribe?token=${encodeURIComponent(token)}`;
 }
 
 exports.handler = async (event) => {
@@ -61,7 +54,7 @@ exports.handler = async (event) => {
   }
 
   const email = (body.email || "").trim();
-  if (!email || !email.includes("@")) {
+  if (!email || !EMAIL_RE.test(email)) {
     return {
       statusCode: 400,
       headers: corsHeaders,
@@ -71,45 +64,52 @@ exports.handler = async (event) => {
 
   try {
     const db = getAybClient();
-
     const token = crypto.randomBytes(32).toString("base64url");
     const escaped = AybClient.escapeSQL(email);
+    const tokenEscaped = AybClient.escapeSQL(token);
+
     const existing = await db.queryObjects(
-      `SELECT id, unsubscribed_at FROM subscribers WHERE email = '${escaped}'`
+      `SELECT id, confirmed_at, unsubscribed_at FROM subscribers WHERE email = '${escaped}'`
     );
 
-    const tokenEscaped = AybClient.escapeSQL(token);
     if (existing.length > 0) {
+      const sub = existing[0];
+      if (sub.confirmed_at && !sub.unsubscribed_at) {
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({ ok: true, already: true }),
+        };
+      }
       await db.query(
-        `UPDATE subscribers SET unsubscribed_at = NULL, unsubscribe_token = '${tokenEscaped}' WHERE id = ${parseInt(existing[0].id, 10)}`
+        `UPDATE subscribers SET unsubscribed_at = NULL, confirmed_at = NULL, ` +
+        `unsubscribe_token = '${tokenEscaped}' ` +
+        `WHERE id = ${parseInt(sub.id, 10)}`
       );
     } else {
       await db.query(
-        `INSERT INTO subscribers (email, unsubscribe_token) VALUES ('${escaped}', '${tokenEscaped}')`
+        `INSERT INTO subscribers (email, unsubscribe_token) ` +
+        `VALUES ('${escaped}', '${tokenEscaped}')`
       );
     }
 
-    const unsub = unsubscribeUrl(token);
     const blogName = process.env.BLOG_NAME || "";
     const blogUrl = process.env.BLOG_URL || "";
+    const confirmUrl = `${blogUrl}/.netlify/functions/confirm?token=${encodeURIComponent(token)}`;
 
     const transporter = getTransporter();
     await transporter.sendMail({
       from: process.env.FROM_EMAIL,
       replyTo: process.env.REPLY_TO || undefined,
       to: email,
-      subject: `You're subscribed to ${blogName}`,
+      subject: `Confirm your subscription to ${blogName}`,
       text: [
-        "Thank you for subscribing! You'll get an email whenever I publish a new post.",
+        `Please confirm your subscription to ${blogName} by visiting this link:`,
         "",
-        `Visit the blog: ${blogUrl}`,
+        confirmUrl,
         "",
-        `To unsubscribe: ${unsub}`,
+        "If you didn't request this, you can ignore this email.",
       ].join("\n"),
-      headers: {
-        "List-Unsubscribe": `<${unsub}>`,
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-      },
     });
 
     return {
@@ -117,11 +117,11 @@ exports.handler = async (event) => {
       headers: corsHeaders,
       body: JSON.stringify({ ok: true }),
     };
-  } catch (e) {
+  } catch {
     return {
       statusCode: 500,
       headers: corsHeaders,
-      body: JSON.stringify({ error: e.message }),
+      body: JSON.stringify({ error: "Something went wrong, please try again." }),
     };
   }
 };

@@ -39,4 +39,7 @@ MIGRATIONS = [
         sent_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         UNIQUE (post_id, subscriber_id)
     )""",
+    # 4: double opt-in. NULL = unconfirmed; only confirmed subscribers
+    # (confirmed_at IS NOT NULL) receive the newsletter.
+    "ALTER TABLE subscribers ADD COLUMN confirmed_at TEXT",
 ]

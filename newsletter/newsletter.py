@@ -155,7 +155,7 @@ def build_text_email(post):
 def fetch_active_subscribers(client):
     return client.rows(
         "SELECT id, email, unsubscribe_token FROM subscribers "
-        "WHERE unsubscribed_at IS NULL ORDER BY id"
+        "WHERE confirmed_at IS NOT NULL AND unsubscribed_at IS NULL ORDER BY id"
     )
 
 
