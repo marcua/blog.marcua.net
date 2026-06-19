@@ -190,14 +190,21 @@ def main():
     if not posts:
         print("No posts found in feed.")
         return
+
+    existing_posts = client.rows("SELECT COUNT(*) as n FROM posts")
+    is_cold_start = int(existing_posts[0]["n"]) == 0
+
     for post in posts:
         post["db_id"] = upsert_post(client, post)
+
+    if is_cold_start:
+        print(f"Cold start: recorded {len(posts)} existing post(s); no emails sent.")
+        return
 
     subscribers = fetch_active_subscribers(client)
     if not subscribers:
         print("No active subscribers.")
         return
-    print(f"{len(subscribers)} active subscriber(s).")
 
     run_results = []
     conn = smtp_connection()
