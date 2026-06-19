@@ -1,33 +1,10 @@
-const { AybClient, runMigrations } = require("@aybdb/client");
+const { AybClient } = require("@aybdb/client");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
-const MIGRATIONS = [
-  `CREATE TABLE IF NOT EXISTS subscribers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL UNIQUE,
-    unsubscribe_token TEXT NOT NULL UNIQUE,
-    subscribed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    unsubscribed_at TEXT
-  )`,
-  `CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    feed_id TEXT NOT NULL UNIQUE,
-    url TEXT NOT NULL,
-    title TEXT NOT NULL,
-    published_at TEXT NOT NULL,
-    first_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  )`,
-  `CREATE TABLE IF NOT EXISTS sends (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    post_id INTEGER NOT NULL REFERENCES posts(id),
-    subscriber_id INTEGER NOT NULL REFERENCES subscribers(id),
-    status TEXT NOT NULL,
-    error TEXT,
-    sent_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (post_id, subscriber_id)
-  )`,
-];
+// Schema migrations are owned by the GitHub Actions cron job
+// (newsletter/migrations.py). This function assumes the `subscribers`
+// table already exists; run the newsletter workflow at least once first.
 
 function getAybClient() {
   const db = new AybClient({ appId: "newsletter" });
@@ -94,7 +71,6 @@ exports.handler = async (event) => {
 
   try {
     const db = getAybClient();
-    await runMigrations(db, "newsletter", MIGRATIONS);
 
     const token = crypto.randomBytes(32).toString("base64url");
     const escaped = AybClient.escapeSQL(email);

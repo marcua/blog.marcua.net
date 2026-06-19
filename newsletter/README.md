@@ -22,6 +22,8 @@ netlify.toml                             # [functions] directory config
 
 Netlify functions use [@aybdb/client](https://www.npmjs.com/package/@aybdb/client) (JS) and [nodemailer](https://www.npmjs.com/package/nodemailer). The newsletter cron job uses a Python ayb client.
 
+Schema migrations run **only** in the GitHub Actions cron job (`migrations.py`), so the newsletter workflow must run at least once (creating the `subscribers` table) before the signup form will work.
+
 ## Setup
 
 ### 1. SMTP
