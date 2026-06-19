@@ -32,7 +32,6 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          AYB_URL: ${{ secrets.AYB_URL }}
-          AYB_DATABASE: ${{ secrets.AYB_DATABASE }}
+          AYB_API_URL: ${{ secrets.AYB_API_URL }}
           AYB_TOKEN: ${{ secrets.AYB_TOKEN }}
         run: python newsletter/newsletter.py

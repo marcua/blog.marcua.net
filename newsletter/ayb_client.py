@@ -38,24 +38,8 @@ class AybClient:
 
     @classmethod
     def from_env(cls):
-        """Build a client from environment variables.
-
-        Accepts either ``AYB_API_URL`` (a full database URL like the JS/Rust
-        clients' ``https://host/v1/entity/database``) or the pair
-        ``AYB_URL`` + ``AYB_DATABASE`` (where the database value may be
-        ``entity/database``).
-        """
-        token = os.environ["AYB_TOKEN"]
-        api_url = os.environ.get("AYB_API_URL")
-        if api_url:
-            return cls.from_url(api_url, token)
-        base_url = os.environ["AYB_URL"]
-        database = os.environ["AYB_DATABASE"]
-        if "/" in database:
-            entity, database = database.split("/", 1)
-        else:
-            entity = os.environ["AYB_ENTITY"]
-        return cls(base_url, entity, database, token)
+        """Build a client from ``AYB_API_URL`` and ``AYB_TOKEN``."""
+        return cls.from_url(os.environ["AYB_API_URL"], os.environ["AYB_TOKEN"])
 
     # --- SQL value rendering (no parameterized queries in ayb) -------------- #
     @staticmethod

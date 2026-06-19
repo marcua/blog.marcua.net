@@ -1,6 +1,6 @@
 """Discover new blog posts from the Atom feed and email subscribers over SMTP.
 
-Sending uses SMTP (configured for Mailgun, but any SMTP server works).
+Sending uses SMTP.
 Subscribers, posts, and per-recipient send records live in an ayb database
 (https://github.com/marcua/ayb). The ``sends`` table is the idempotency ledger:
 a (post, subscriber) pair with status 'sent' is never emailed again.

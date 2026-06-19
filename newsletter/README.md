@@ -1,6 +1,6 @@
 # Newsletter
 
-Email subscribers when a new post is published. Subscribers sign up via a form on the blog; a GitHub Actions cron job checks the Atom feed every 4 hours and sends new posts via SMTP (Mailgun).
+Email subscribers when a new post is published. Subscribers sign up via a form on the blog; a GitHub Actions cron job checks the Atom feed every 4 hours and sends new posts via SMTP.
 
 Subscriber data lives in an [ayb](https://github.com/marcua/ayb) database. A `sends` table tracks which (post, subscriber) pairs have been emailed, guaranteeing at-most-once delivery per pair.
 
@@ -21,7 +21,7 @@ netlify.toml                           # [functions] directory config
 
 ## Setup
 
-### 1. SMTP (Mailgun or any provider)
+### 1. SMTP
 - Verify your domain, note SMTP credentials
 
 ### 2. ayb
@@ -36,7 +36,7 @@ netlify.toml                           # [functions] directory config
 | `FROM_EMAIL` | `You <you@yourdomain.com>` |
 | `REPLY_TO` | `you@yourdomain.com` |
 | `ADMIN_EMAIL` | `you@yourdomain.com` |
-| `SMTP_HOST` | `smtp.mailgun.org` |
+| `SMTP_HOST` | `smtp.example.com` |
 | `SMTP_PORT` | `587` |
 | `SMTP_USERNAME` | `postmaster@yourdomain.com` |
 | `SMTP_PASSWORD` | `...` |
