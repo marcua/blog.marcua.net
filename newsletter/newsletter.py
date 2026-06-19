@@ -17,9 +17,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "netlify" / "functions"))
 
-from ayb_client import AybClient
+from _ayb_client import AybClient
 from migrations import APP_ID, MIGRATIONS
-from shared import BLOG_URL, build_message, smtp_connection, unsubscribe_url
+from _shared import BLOG_URL, build_message, smtp_connection, unsubscribe_url
 
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
 

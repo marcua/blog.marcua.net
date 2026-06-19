@@ -2,8 +2,8 @@ import json
 import secrets
 import urllib.parse
 
-from ayb_client import AybClient
-from shared import BLOG_NAME, BLOG_URL, build_message, send_smtp, unsubscribe_url
+from _ayb_client import AybClient
+from _shared import BLOG_NAME, BLOG_URL, build_message, send_smtp, unsubscribe_url
 
 _client = None
 sql_literal = AybClient.sql_literal

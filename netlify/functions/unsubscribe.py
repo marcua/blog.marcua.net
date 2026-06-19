@@ -1,7 +1,7 @@
 import json
 
-from ayb_client import AybClient
-from shared import BLOG_URL
+from _ayb_client import AybClient
+from _shared import BLOG_URL
 
 _client = None
 sql_literal = AybClient.sql_literal
