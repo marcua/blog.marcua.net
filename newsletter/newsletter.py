@@ -9,22 +9,60 @@ a (post, subscriber) pair with status 'sent' is never emailed again.
 import contextlib
 import os
 import re
-import sys
+import smtplib
 import time
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from pathlib import Path
+from email.message import EmailMessage
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "netlify" / "functions"))
-
-from _ayb_client import AybClient
+from ayb_client import AybClient
 from migrations import APP_ID, MIGRATIONS
-from _shared import BLOG_URL, build_message, smtp_connection, unsubscribe_url
 
+BLOG_URL = os.environ.get("BLOG_URL", "")
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "")
 
 ATOM_NS = {"atom": "http://www.w3.org/2005/Atom"}
 RATE_LIMIT_SECONDS = 0.6
+
+
+# --------------------------------------------------------------------------- #
+# SMTP
+# --------------------------------------------------------------------------- #
+def smtp_connection():
+    host = os.environ["SMTP_HOST"]
+    port = int(os.environ.get("SMTP_PORT", "587"))
+    username = os.environ["SMTP_USERNAME"]
+    password = os.environ["SMTP_PASSWORD"]
+    if port == 465:
+        conn = smtplib.SMTP_SSL(host, port)
+    else:
+        conn = smtplib.SMTP(host, port)
+        conn.starttls()
+    conn.login(username, password)
+    return conn
+
+
+def unsubscribe_url(token):
+    return f"{BLOG_URL}/.netlify/functions/unsubscribe?token={urllib.parse.quote(token)}"
+
+
+def build_message(to, subject, text_body, html_body=None, list_unsubscribe=None):
+    from_email = os.environ.get("FROM_EMAIL", "")
+    reply_to = os.environ.get("REPLY_TO", "")
+    msg = EmailMessage()
+    msg["From"] = from_email
+    msg["To"] = to
+    msg["Subject"] = subject
+    if reply_to:
+        msg["Reply-To"] = reply_to
+    if list_unsubscribe:
+        msg["List-Unsubscribe"] = f"<{list_unsubscribe}>"
+        msg["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+    msg.set_content(text_body)
+    if html_body:
+        msg.add_alternative(html_body, subtype="html")
+    return msg
 
 
 # --------------------------------------------------------------------------- #
