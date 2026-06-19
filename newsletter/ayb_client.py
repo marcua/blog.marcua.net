@@ -7,6 +7,7 @@ parameterized-query support — so every interpolated value MUST be rendered wit
 
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -24,12 +25,32 @@ class AybClient:
         self.token = token
 
     @classmethod
+    def from_url(cls, url, token):
+        """Parse a database URL like ``https://host/v1/entity/database``.
+
+        Mirrors the JS client's ``parseDatabaseUrl``: accepts the URL with or
+        without the ``/v1/`` prefix.
+        """
+        match = re.match(r"^(https?://[^/]+)(?:/v1)?/([^/]+)/([^/]+)$", url)
+        if not match:
+            raise ValueError(f"Cannot parse ayb database URL: {url}")
+        return cls(match.group(1), match.group(2), match.group(3), token)
+
+    @classmethod
     def from_env(cls):
-        base_url = os.environ["AYB_URL"]
+        """Build a client from environment variables.
+
+        Accepts either ``AYB_API_URL`` (a full database URL like the JS/Rust
+        clients' ``https://host/v1/entity/database``) or the pair
+        ``AYB_URL`` + ``AYB_DATABASE`` (where the database value may be
+        ``entity/database``).
+        """
         token = os.environ["AYB_TOKEN"]
+        api_url = os.environ.get("AYB_API_URL")
+        if api_url:
+            return cls.from_url(api_url, token)
+        base_url = os.environ["AYB_URL"]
         database = os.environ["AYB_DATABASE"]
-        # AYB_DATABASE may be the full "entity/database" slug, or just the
-        # database with AYB_ENTITY supplied separately.
         if "/" in database:
             entity, database = database.split("/", 1)
         else:

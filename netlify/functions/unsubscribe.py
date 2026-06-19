@@ -1,11 +1,8 @@
 import json
 import os
-import urllib.request
-import urllib.error
 
+from _ayb import ayb_query, ayb_rows, sql_literal
 
-RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
-RESEND_AUDIENCE_ID = os.environ.get("RESEND_AUDIENCE_ID", "")
 BLOG_URL = "https://blog.marcua.net"
 
 CORS_HEADERS = {
@@ -26,52 +23,35 @@ def handler(event, context):
             "body": json.dumps({"error": "Method not allowed"}),
         }
 
-    email = (event.get("queryStringParameters") or {}).get("email", "").strip()
-    if not email or "@" not in email:
+    token = (event.get("queryStringParameters") or {}).get("token", "").strip()
+    if not token:
         return {
             "statusCode": 400,
             "headers": {**CORS_HEADERS, "Content-Type": "text/html"},
-            "body": "<html><body><p>Invalid or missing email address.</p></body></html>",
+            "body": "<html><body><p>Invalid or missing unsubscribe link.</p></body></html>",
         }
 
     try:
-        # Find the contact ID for this email
-        req = urllib.request.Request(
-            f"https://api.resend.com/audiences/{RESEND_AUDIENCE_ID}/contacts",
-            headers={
-                "Authorization": f"Bearer {RESEND_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            method="GET",
+        rows = ayb_rows(
+            f"SELECT id FROM subscribers "
+            f"WHERE unsubscribe_token = {sql_literal(token)} "
+            f"AND unsubscribed_at IS NULL"
         )
-        with urllib.request.urlopen(req) as resp:
-            contacts = json.loads(resp.read()).get("data", [])
-
-        contact = next((c for c in contacts if c["email"] == email), None)
-        if contact is None:
+        if not rows:
             return {
                 "statusCode": 200,
                 "headers": {**CORS_HEADERS, "Content-Type": "text/html"},
                 "body": (
                     "<html><body>"
-                    "<p>That email address was not found in our subscriber list.</p>"
+                    "<p>This unsubscribe link is not valid or you are already unsubscribed.</p>"
                     "</body></html>"
                 ),
             }
 
-        # Update contact to unsubscribed
-        data = json.dumps({"unsubscribed": True}).encode("utf-8")
-        req = urllib.request.Request(
-            f"https://api.resend.com/audiences/{RESEND_AUDIENCE_ID}/contacts/{contact['id']}",
-            data=data,
-            headers={
-                "Authorization": f"Bearer {RESEND_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            method="PATCH",
+        ayb_query(
+            f"UPDATE subscribers SET unsubscribed_at = CURRENT_TIMESTAMP "
+            f"WHERE id = {int(rows[0]['id'])}"
         )
-        with urllib.request.urlopen(req) as resp:
-            resp.read()
 
         return {
             "statusCode": 200,
@@ -80,17 +60,6 @@ def handler(event, context):
                 "<html><body>"
                 "<p>You've been unsubscribed. You won't receive any more emails.</p>"
                 f'<p><a href="{BLOG_URL}">Back to blog</a></p>'
-                "</body></html>"
-            ),
-        }
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8", errors="replace")
-        return {
-            "statusCode": 500,
-            "headers": {**CORS_HEADERS, "Content-Type": "text/html"},
-            "body": (
-                "<html><body>"
-                "<p>Something went wrong. Please try again later.</p>"
                 "</body></html>"
             ),
         }

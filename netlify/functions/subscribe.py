@@ -1,13 +1,15 @@
+import contextlib
 import json
 import os
+import secrets
+import smtplib
 import urllib.parse
-import urllib.request
-import urllib.error
+from email.message import EmailMessage
 
+from _ayb import ayb_query, ayb_rows, sql_literal
 
-RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
-RESEND_AUDIENCE_ID = os.environ.get("RESEND_AUDIENCE_ID", "")
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "")
+REPLY_TO = os.environ.get("REPLY_TO", "")
 BLOG_NAME = "N=1 (marcua's blog)"
 BLOG_URL = "https://blog.marcua.net"
 
@@ -18,19 +20,38 @@ CORS_HEADERS = {
 }
 
 
-def resend_request(path, payload):
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        f"https://api.resend.com{path}",
-        data=data,
-        headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
+def _send_confirmation(email, unsub_url):
+    host = os.environ["SMTP_HOST"]
+    port = int(os.environ.get("SMTP_PORT", "587"))
+    username = os.environ["SMTP_USERNAME"]
+    password = os.environ["SMTP_PASSWORD"]
+
+    msg = EmailMessage()
+    msg["From"] = FROM_EMAIL
+    msg["To"] = email
+    msg["Subject"] = f"You're subscribed to {BLOG_NAME}"
+    if REPLY_TO:
+        msg["Reply-To"] = REPLY_TO
+    msg["List-Unsubscribe"] = f"<{unsub_url}>"
+    msg["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+    msg.set_content(
+        f"Thank you for subscribing! You'll get an email whenever "
+        f"I publish a new post.\n\n"
+        f"Visit the blog: {BLOG_URL}\n\n"
+        f"To unsubscribe: {unsub_url}"
     )
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read())
+
+    if port == 465:
+        smtp = smtplib.SMTP_SSL(host, port)
+    else:
+        smtp = smtplib.SMTP(host, port)
+        smtp.starttls()
+    try:
+        smtp.login(username, password)
+        smtp.send_message(msg)
+    finally:
+        with contextlib.suppress(Exception):
+            smtp.quit()
 
 
 def handler(event, context):
@@ -62,45 +83,35 @@ def handler(event, context):
         }
 
     try:
-        # Add contact to audience
-        resend_request("/contacts", {
-            "email": email,
-            "audience_id": RESEND_AUDIENCE_ID,
-            "unsubscribed": False,
-        })
+        token = secrets.token_urlsafe(32)
 
-        # Send confirmation email
+        # Re-subscribe if previously unsubscribed, otherwise insert new.
+        existing = ayb_rows(
+            f"SELECT id, unsubscribed_at FROM subscribers "
+            f"WHERE email = {sql_literal(email)}"
+        )
+        if existing:
+            ayb_query(
+                f"UPDATE subscribers SET unsubscribed_at = NULL, "
+                f"unsubscribe_token = {sql_literal(token)} "
+                f"WHERE id = {int(existing[0]['id'])}"
+            )
+        else:
+            ayb_query(
+                f"INSERT INTO subscribers (email, unsubscribe_token) "
+                f"VALUES ({sql_literal(email)}, {sql_literal(token)})"
+            )
+
         unsub_url = (
             f"{BLOG_URL}/.netlify/functions/unsubscribe"
-            f"?email={urllib.parse.quote(email)}"
+            f"?token={urllib.parse.quote(token)}"
         )
-        resend_request("/emails", {
-            "from": FROM_EMAIL,
-            "to": [email],
-            "subject": f"You're subscribed to {BLOG_NAME}",
-            "text": (
-                f"Thank you for subscribing! You'll get an email whenever "
-                f"I publish a new post.\n\n"
-                f"Visit the blog: {BLOG_URL}\n\n"
-                f"To unsubscribe: {unsub_url}"
-            ),
-            "headers": {
-                "List-Unsubscribe": f"<{unsub_url}>",
-                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-            },
-        })
+        _send_confirmation(email, unsub_url)
 
         return {
             "statusCode": 200,
             "headers": CORS_HEADERS,
             "body": json.dumps({"ok": True}),
-        }
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8", errors="replace")
-        return {
-            "statusCode": 500,
-            "headers": CORS_HEADERS,
-            "body": json.dumps({"error": f"Resend API error: {error_body}"}),
         }
     except Exception as e:
         return {
