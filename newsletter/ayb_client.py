@@ -1,9 +1,4 @@
-"""Minimal Python HTTP client for ayb (https://github.com/marcua/ayb).
-
-ayb's query endpoint takes a raw SQL string as the request body — there is no
-parameterized-query support — so every interpolated value MUST be rendered with
-``sql_literal`` (or escaped with ``escape`` and wrapped in single quotes).
-"""
+"""Minimal Python HTTP client for ayb (https://github.com/marcua/ayb)."""
 
 import json
 import os
@@ -26,11 +21,6 @@ class AybClient:
 
     @classmethod
     def from_url(cls, url, token):
-        """Parse a database URL like ``https://host/v1/entity/database``.
-
-        Mirrors the JS client's ``parseDatabaseUrl``: accepts the URL with or
-        without the ``/v1/`` prefix.
-        """
         match = re.match(r"^(https?://[^/]+)(?:/v1)?/([^/]+)/([^/]+)$", url)
         if not match:
             raise ValueError(f"Cannot parse ayb database URL: {url}")
@@ -38,18 +28,14 @@ class AybClient:
 
     @classmethod
     def from_env(cls):
-        """Build a client from ``AYB_API_URL`` and ``AYB_TOKEN``."""
         return cls.from_url(os.environ["AYB_API_URL"], os.environ["AYB_TOKEN"])
 
-    # --- SQL value rendering (no parameterized queries in ayb) -------------- #
     @staticmethod
     def escape(value):
-        """Escape a string for safe use *inside single quotes* in SQL."""
         return str(value).replace("'", "''")
 
     @classmethod
     def sql_literal(cls, value):
-        """Render a Python value as a SQL literal."""
         if value is None:
             return "NULL"
         if isinstance(value, bool):
@@ -58,7 +44,6 @@ class AybClient:
             return str(value)
         return "'" + cls.escape(value) + "'"
 
-    # --- Requests ---------------------------------------------------------- #
     def query(self, sql, retries=3):
         url = f"{self.base_url}/v1/{self.entity}/{self.database}/query"
         data = sql.encode("utf-8")
@@ -66,9 +51,7 @@ class AybClient:
         last_err = None
         for attempt in range(1, retries + 1):
             req = urllib.request.Request(
-                url,
-                data=data,
-                method="POST",
+                url, data=data, method="POST",
                 headers={
                     "Authorization": f"Bearer {self.token}",
                     "Content-Type": "text/plain",
@@ -79,7 +62,6 @@ class AybClient:
                     body = resp.read()
                     return json.loads(body) if body else {"fields": [], "rows": []}
             except urllib.error.HTTPError as exc:
-                # 4xx/5xx from ayb: surface immediately, don't retry blindly.
                 detail = exc.read().decode("utf-8", "replace")
                 raise AybError(f"ayb query failed ({exc.code}): {detail}") from exc
             except urllib.error.URLError as exc:
@@ -90,18 +72,11 @@ class AybClient:
         raise AybError(f"ayb query failed after {retries} attempt(s): {last_err}")
 
     def rows(self, sql):
-        """Run a query and return rows as dicts keyed by column name."""
         result = self.query(sql)
         fields = result.get("fields", [])
         return [dict(zip(fields, row)) for row in result.get("rows", [])]
 
-    # --- Migrations -------------------------------------------------------- #
     def migrate(self, app_id, migrations):
-        """Apply append-only DDL migrations, tracked per app in _ayb_migrations.
-
-        ``migrations`` is a list of single-statement SQL strings; a migration's
-        version is its 1-based index. Returns the number of migrations applied.
-        """
         app = self.escape(app_id)
         self.query(
             "CREATE TABLE IF NOT EXISTS _ayb_migrations ("

@@ -9,17 +9,18 @@ On cold start (empty `posts` table), the script records all current feed posts w
 ## Files
 
 ```
-newsletter/newsletter.py                # checks feed, emails subscribers via SMTP
-newsletter/migrations.py                # schema DDL (subscribers, posts, sends)
-netlify/functions/subscribe.py           # Netlify Function: adds subscriber + sends confirmation
-netlify/functions/unsubscribe.py         # Netlify Function: marks subscriber unsubscribed
-netlify/functions/_ayb_client.py         # ayb HTTP client (query, escaping, migrations)
-netlify/functions/_shared.py             # shared SMTP, constants, helpers
+newsletter/newsletter.py                # checks feed, emails subscribers via SMTP (GitHub Actions)
+newsletter/ayb_client.py                 # ayb Python HTTP client (query, escaping, migrations)
+newsletter/migrations.py                 # schema DDL (subscribers, posts, sends)
+netlify/functions/subscribe.js           # Netlify Function: adds subscriber + sends confirmation
+netlify/functions/unsubscribe.js         # Netlify Function: marks subscriber unsubscribed
 _includes/subscribe-form.html           # signup form (include in any layout)
 _layouts/base.html                       # overrides minima to show form on every page
 .github/workflows/newsletter.yml        # cron schedule (every 4h) + workflow_dispatch
 netlify.toml                             # [functions] directory config
 ```
+
+Netlify functions use [@aybdb/client](https://www.npmjs.com/package/@aybdb/client) (JS) and [nodemailer](https://www.npmjs.com/package/nodemailer). The newsletter cron job uses a Python ayb client.
 
 ## Setup
 

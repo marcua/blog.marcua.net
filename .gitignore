@@ -10,3 +10,6 @@ vendor
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Node
+node_modules/
