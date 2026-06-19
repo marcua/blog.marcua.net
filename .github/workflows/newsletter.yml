@@ -5,11 +5,8 @@ on:
     - cron: "0 */4 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
-
-# Never let a scheduled run overlap a manual dispatch (or another schedule);
-# overlapping runs would each read the same state and double-send.
+# Never let a scheduled run overlap a manual dispatch; overlapping runs could
+# both read "not yet sent" for the same recipient and double-send.
 concurrency:
   group: newsletter
   cancel-in-progress: false
@@ -19,9 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # Full history so the script can rebase/push the state file cleanly.
-          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -31,16 +25,14 @@ jobs:
         env:
           PYTHONUNBUFFERED: "1"
           BLOG_URL: ${{ secrets.BLOG_URL }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID }}
           FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          REPLY_TO: ${{ secrets.REPLY_TO }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          AYB_URL: ${{ secrets.AYB_URL }}
+          AYB_DATABASE: ${{ secrets.AYB_DATABASE }}
+          AYB_TOKEN: ${{ secrets.AYB_TOKEN }}
         run: python newsletter/newsletter.py
-
-      - name: Backstop push state
-        # The script checkpoints/pushes per post; this catches a state commit
-        # that was made locally but not pushed (e.g. a late failure).
-        if: always()
-        run: |
-          git pull --rebase --autostash origin "$GITHUB_REF_NAME" || true
-          git push origin "HEAD:$GITHUB_REF_NAME" || true
