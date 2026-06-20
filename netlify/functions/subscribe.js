@@ -6,7 +6,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function getAybClient() {
   const db = new AybClient({ appId: "newsletter" });
-  db.saveConfig(process.env.AYB_API_URL, process.env.AYB_TOKEN);
+  const parsed = AybClient.parseDatabaseUrl(process.env.AYB_API_URL);
+  db._config = { ...parsed, token: process.env.AYB_TOKEN };
   return db;
 }
 

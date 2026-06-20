@@ -2,7 +2,8 @@ const { AybClient } = require("@aybdb/client");
 
 function getAybClient() {
   const db = new AybClient({ appId: "newsletter" });
-  db.saveConfig(process.env.AYB_API_URL, process.env.AYB_TOKEN);
+  const parsed = AybClient.parseDatabaseUrl(process.env.AYB_API_URL);
+  db._config = { ...parsed, token: process.env.AYB_TOKEN };
   return db;
 }
 
@@ -29,7 +30,7 @@ exports.handler = async (event) => {
 
     if (event.httpMethod === "GET") {
       const rows = await db.queryObjects(
-        `SELECT id, confirmed_at FROM subscribers WHERE secret_token = '${escaped}'`
+        `SELECT id, confirmed_at FROM subscribers WHERE secret_token = '${escaped}' AND unsubscribed_at IS NULL`
       );
       if (rows.length === 0) {
         return html("<p>This confirmation link is not valid.</p>");
@@ -47,7 +48,7 @@ exports.handler = async (event) => {
 
     if (event.httpMethod === "POST") {
       const rows = await db.queryObjects(
-        `SELECT id, confirmed_at FROM subscribers WHERE secret_token = '${escaped}'`
+        `SELECT id, confirmed_at FROM subscribers WHERE secret_token = '${escaped}' AND unsubscribed_at IS NULL`
       );
       if (rows.length === 0) {
         return html("<p>This confirmation link is not valid.</p>");
