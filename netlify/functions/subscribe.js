@@ -83,12 +83,12 @@ exports.handler = async (event) => {
       }
       await db.query(
         `UPDATE subscribers SET unsubscribed_at = NULL, confirmed_at = NULL, ` +
-        `unsubscribe_token = '${tokenEscaped}' ` +
+        `secret_token = '${tokenEscaped}' ` +
         `WHERE id = ${parseInt(sub.id, 10)}`
       );
     } else {
       await db.query(
-        `INSERT INTO subscribers (email, unsubscribe_token) ` +
+        `INSERT INTO subscribers (email, secret_token) ` +
         `VALUES ('${escaped}', '${tokenEscaped}')`
       );
     }

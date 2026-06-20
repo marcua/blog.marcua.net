@@ -154,7 +154,7 @@ def build_text_email(post):
 # --------------------------------------------------------------------------- #
 def fetch_active_subscribers(client):
     return client.rows(
-        "SELECT id, email, unsubscribe_token FROM subscribers "
+        "SELECT id, email, secret_token FROM subscribers "
         "WHERE confirmed_at IS NOT NULL AND unsubscribed_at IS NULL ORDER BY id"
     )
 
@@ -263,7 +263,7 @@ def main():
             sent_count = 0
             failed_emails = []
             for sub in recipients:
-                unsub = unsubscribe_url(sub["unsubscribe_token"])
+                unsub = unsubscribe_url(sub["secret_token"])
                 text_body = text_tmpl.replace("{{UNSUBSCRIBE_URL}}", unsub)
                 html_body = (
                     html_tmpl.replace("{{UNSUBSCRIBE_URL}}", unsub) if html_tmpl else None

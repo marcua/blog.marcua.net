@@ -20,7 +20,7 @@ async function doUnsubscribe(token) {
   const db = getAybClient();
   const escaped = AybClient.escapeSQL(token);
   const rows = await db.queryObjects(
-    `SELECT id FROM subscribers WHERE unsubscribe_token = '${escaped}' AND unsubscribed_at IS NULL`
+    `SELECT id FROM subscribers WHERE secret_token = '${escaped}' AND unsubscribed_at IS NULL`
   );
   if (rows.length === 0) {
     return { found: false };

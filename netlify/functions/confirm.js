@@ -29,7 +29,7 @@ exports.handler = async (event) => {
 
     if (event.httpMethod === "GET") {
       const rows = await db.queryObjects(
-        `SELECT id, confirmed_at FROM subscribers WHERE unsubscribe_token = '${escaped}'`
+        `SELECT id, confirmed_at FROM subscribers WHERE secret_token = '${escaped}'`
       );
       if (rows.length === 0) {
         return html("<p>This confirmation link is not valid.</p>");
@@ -47,7 +47,7 @@ exports.handler = async (event) => {
 
     if (event.httpMethod === "POST") {
       const rows = await db.queryObjects(
-        `SELECT id, confirmed_at FROM subscribers WHERE unsubscribe_token = '${escaped}'`
+        `SELECT id, confirmed_at FROM subscribers WHERE secret_token = '${escaped}'`
       );
       if (rows.length === 0) {
         return html("<p>This confirmation link is not valid.</p>");

@@ -10,8 +10,8 @@ Rules (matching the ayb migration convention):
 APP_ID = "newsletter"
 
 MIGRATIONS = [
-    # 1: subscribers. unsubscribed_at IS NULL means active. unsubscribe_token
-    # is a random secret used in unsubscribe links (never expose the email).
+    # 1: subscribers. Column originally named unsubscribe_token, renamed to
+    # secret_token in migration 5.
     """CREATE TABLE IF NOT EXISTS subscribers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT NOT NULL UNIQUE,
@@ -42,4 +42,6 @@ MIGRATIONS = [
     # 4: double opt-in. NULL = unconfirmed; only confirmed subscribers
     # (confirmed_at IS NOT NULL) receive the newsletter.
     "ALTER TABLE subscribers ADD COLUMN confirmed_at TEXT",
+    # 5: rename unsubscribe_token -> secret_token (serves confirm + unsubscribe).
+    "ALTER TABLE subscribers RENAME COLUMN unsubscribe_token TO secret_token",
 ]
