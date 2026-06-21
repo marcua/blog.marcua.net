@@ -154,7 +154,7 @@ def build_text_email(post):
 # --------------------------------------------------------------------------- #
 def fetch_active_subscribers(client):
     return client.rows(
-        "SELECT id, email, secret_token FROM subscribers "
+        "SELECT id, email, secret_token, confirmed_at FROM subscribers "
         "WHERE confirmed_at IS NOT NULL AND unsubscribed_at IS NULL ORDER BY id"
     )
 
@@ -249,7 +249,15 @@ def main():
     try:
         for post in sorted(posts, key=lambda p: p["published"]):
             already_sent = already_sent_subscriber_ids(client, post["db_id"])
-            recipients = [s for s in subscribers if int(s["id"]) not in already_sent]
+            # Only send to subscribers who confirmed before the post was
+            # published. Both timestamps start with YYYY-MM-DD so
+            # lexicographic comparison works across format variants.
+            pub_date = post["published"][:10]
+            recipients = [
+                s for s in subscribers
+                if int(s["id"]) not in already_sent
+                and s["confirmed_at"][:10] <= pub_date
+            ]
             if not recipients:
                 continue
 
