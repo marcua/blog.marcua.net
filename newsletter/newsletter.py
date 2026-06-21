@@ -155,15 +155,15 @@ def build_text_email(post):
 def fetch_eligible_recipients(client, post_id, published_date):
     """Return subscribers who confirmed on or before published_date and
     haven't already been sent this post."""
-    pub = AybClient.sql_literal(published_date[:10])
+    pub = AybClient.sql_literal(published_date)
     return client.rows(
         f"SELECT s.id, s.email, s.secret_token FROM subscribers s "
         f"WHERE s.confirmed_at IS NOT NULL "
         f"AND s.unsubscribed_at IS NULL "
-        f"AND DATE(s.confirmed_at) <= {pub} "
+        f"AND DATETIME(s.confirmed_at) <= DATETIME({pub}) "
         f"AND s.id NOT IN ("
         f"  SELECT subscriber_id FROM sends "
-        f"  WHERE post_id = {int(post_id)} AND status = 'sent'"
+        f"  WHERE post_id = {int(post_id)}"
         f") ORDER BY s.id"
     )
 
