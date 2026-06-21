@@ -1,15 +1,9 @@
 const { AybClient } = require("@aybdb/client");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const { BLOG_NAME, getAybClient } = require("./_shared");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function getAybClient() {
-  const db = new AybClient({ appId: "newsletter" });
-  const parsed = AybClient.parseDatabaseUrl(process.env.AYB_API_URL);
-  db._config = { ...parsed, token: process.env.AYB_TOKEN };
-  return db;
-}
 
 function getTransporter() {
   const port = parseInt(process.env.SMTP_PORT || "587", 10);
@@ -94,7 +88,6 @@ exports.handler = async (event) => {
       );
     }
 
-    const blogName = process.env.BLOG_NAME || "";
     const blogUrl = process.env.BLOG_URL || "";
     const confirmUrl = `${blogUrl}/.netlify/functions/confirm?token=${encodeURIComponent(token)}`;
 
@@ -103,9 +96,9 @@ exports.handler = async (event) => {
       from: process.env.FROM_EMAIL,
       replyTo: process.env.REPLY_TO || undefined,
       to: email,
-      subject: `Confirm your subscription to ${blogName}`,
+      subject: `Confirm your subscription to ${BLOG_NAME}`,
       text: [
-        `Please confirm your subscription to ${blogName} by visiting this link:`,
+        `Please confirm your subscription to ${BLOG_NAME} by visiting this link:`,
         "",
         confirmUrl,
         "",
