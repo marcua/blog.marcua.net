@@ -152,10 +152,19 @@ def build_text_email(post):
 # --------------------------------------------------------------------------- #
 # ayb data access
 # --------------------------------------------------------------------------- #
-def fetch_active_subscribers(client):
+def fetch_eligible_recipients(client, post_id, published_date):
+    """Return subscribers who confirmed on or before published_date and
+    haven't already been sent this post."""
+    pub = AybClient.sql_literal(published_date[:10])
     return client.rows(
-        "SELECT id, email, secret_token, confirmed_at FROM subscribers "
-        "WHERE confirmed_at IS NOT NULL AND unsubscribed_at IS NULL ORDER BY id"
+        f"SELECT s.id, s.email, s.secret_token FROM subscribers s "
+        f"WHERE s.confirmed_at IS NOT NULL "
+        f"AND s.unsubscribed_at IS NULL "
+        f"AND DATE(s.confirmed_at) <= {pub} "
+        f"AND s.id NOT IN ("
+        f"  SELECT subscriber_id FROM sends "
+        f"  WHERE post_id = {int(post_id)} AND status = 'sent'"
+        f") ORDER BY s.id"
     )
 
 
@@ -171,14 +180,6 @@ def upsert_post(client, post):
         f"SELECT id FROM posts WHERE feed_id = {AybClient.sql_literal(post['id'])}"
     )
     return int(rows[0]["id"])
-
-
-def already_sent_subscriber_ids(client, post_id):
-    rows = client.rows(
-        f"SELECT subscriber_id FROM sends WHERE post_id = {int(post_id)} "
-        "AND status = 'sent'"
-    )
-    return {int(r["subscriber_id"]) for r in rows}
 
 
 def record_send(client, post_id, subscriber_id, status, error=None):
@@ -239,25 +240,13 @@ def main():
         print(f"Cold start: recorded {len(posts)} existing post(s); no emails sent.")
         return
 
-    subscribers = fetch_active_subscribers(client)
-    if not subscribers:
-        print("No active subscribers.")
-        return
-
     run_results = []
     conn = smtp_connection()
     try:
         for post in sorted(posts, key=lambda p: p["published"]):
-            already_sent = already_sent_subscriber_ids(client, post["db_id"])
-            # Only send to subscribers who confirmed before the post was
-            # published. Both timestamps start with YYYY-MM-DD so
-            # lexicographic comparison works across format variants.
-            pub_date = post["published"][:10]
-            recipients = [
-                s for s in subscribers
-                if int(s["id"]) not in already_sent
-                and s["confirmed_at"][:10] <= pub_date
-            ]
+            recipients = fetch_eligible_recipients(
+                client, post["db_id"], post["published"]
+            )
             if not recipients:
                 continue
 
