@@ -1,22 +1,8 @@
 const { AybClient } = require("@aybdb/client");
-const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const { BLOG_NAME, getAybClient } = require("./_shared");
+const { BLOG_NAME, getAybClient, getTransporter } = require("./_shared");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function getTransporter() {
-  const port = parseInt(process.env.SMTP_PORT || "587", 10);
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USERNAME,
-      pass: process.env.SMTP_PASSWORD,
-    },
-  });
-}
 
 exports.handler = async (event) => {
   const corsHeaders = {
@@ -89,7 +75,7 @@ exports.handler = async (event) => {
     }
 
     const blogUrl = process.env.BLOG_URL || "";
-    const confirmUrl = `${blogUrl}/.netlify/functions/confirm?token=${encodeURIComponent(token)}`;
+    const confirmUrl = `${blogUrl}/newsletter/confirm?token=${encodeURIComponent(token)}`;
 
     const transporter = getTransporter();
     await transporter.sendMail({

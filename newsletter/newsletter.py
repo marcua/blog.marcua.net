@@ -44,7 +44,7 @@ def smtp_connection():
 
 
 def unsubscribe_url(token):
-    return f"{BLOG_URL}/.netlify/functions/unsubscribe?token={urllib.parse.quote(token)}"
+    return f"{BLOG_URL}/newsletter/unsubscribe?token={urllib.parse.quote(token)}"
 
 
 def build_message(to, subject, text_body, html_body=None, list_unsubscribe=None):

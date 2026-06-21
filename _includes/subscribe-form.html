@@ -20,7 +20,7 @@
     e.preventDefault();
     msg.style.display = "none";
     var email = form.email.value;
-    fetch("/.netlify/functions/subscribe", {
+    fetch("/newsletter/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email }),
