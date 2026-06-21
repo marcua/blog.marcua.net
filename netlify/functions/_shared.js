@@ -1,7 +1,7 @@
 const { AybClient } = require("@aybdb/client");
 const nodemailer = require("nodemailer");
 
-const BLOG_URL = process.env.BLOG_URL || "";
+const BLOG_URL = (process.env.BLOG_URL || "").replace(/\/+$/, "");
 const BLOG_NAME = process.env.BLOG_NAME || "";
 
 function getAybClient() {

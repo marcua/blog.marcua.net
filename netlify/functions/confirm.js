@@ -23,7 +23,7 @@ exports.handler = async (event) => {
       }
       return html(
         `<p>Confirm your subscription to ${BLOG_NAME}?</p>` +
-        `<form method="POST" action="/.netlify/functions/confirm?token=${encodeURIComponent(token.trim())}">` +
+        `<form method="POST" action="/newsletter/confirm?token=${encodeURIComponent(token.trim())}">` +
         `<button type="submit" style="padding:0.5em 1.5em;font-size:1em;cursor:pointer;">Yes, subscribe me</button>` +
         `</form>`
       );

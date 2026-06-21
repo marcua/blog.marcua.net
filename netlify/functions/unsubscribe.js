@@ -41,7 +41,7 @@ exports.handler = async (event) => {
     if (event.httpMethod === "GET") {
       return html(
         `<p>Unsubscribe from future emails?</p>` +
-        `<form method="POST" action="/.netlify/functions/unsubscribe?token=${encodeURIComponent(token.trim())}">` +
+        `<form method="POST" action="/newsletter/unsubscribe?token=${encodeURIComponent(token.trim())}">` +
         `<button type="submit" style="padding:0.5em 1.5em;font-size:1em;cursor:pointer;">Yes, unsubscribe me</button>` +
         `</form>`
       );

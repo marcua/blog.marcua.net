@@ -75,7 +75,7 @@ exports.handler = async (event) => {
     }
 
     const blogUrl = process.env.BLOG_URL || "";
-    const confirmUrl = `${blogUrl}/.netlify/functions/confirm?token=${encodeURIComponent(token)}`;
+    const confirmUrl = `${blogUrl}/newsletter/confirm?token=${encodeURIComponent(token)}`;
 
     const transporter = getTransporter();
     await transporter.sendMail({
