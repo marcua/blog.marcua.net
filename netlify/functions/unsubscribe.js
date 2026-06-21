@@ -1,11 +1,11 @@
 const { AybClient } = require("@aybdb/client");
-const { BLOG_URL, getAybClient, html } = require("./_shared");
+const { BLOG_URL, BLOG_NAME, getAybClient, getTransporter, html } = require("./_shared");
 
 async function doUnsubscribe(token) {
   const db = getAybClient();
   const escaped = AybClient.escapeSQL(token);
   const rows = await db.queryObjects(
-    `SELECT id FROM subscribers WHERE secret_token = '${escaped}' AND unsubscribed_at IS NULL`
+    `SELECT id, email FROM subscribers WHERE secret_token = '${escaped}' AND unsubscribed_at IS NULL`
   );
   if (rows.length === 0) {
     return { found: false };
@@ -13,7 +13,22 @@ async function doUnsubscribe(token) {
   await db.query(
     `UPDATE subscribers SET unsubscribed_at = CURRENT_TIMESTAMP WHERE id = ${parseInt(rows[0].id, 10)}`
   );
-  return { found: true };
+  return { found: true, email: rows[0].email };
+}
+
+async function sendUnsubscribeConfirmation(email) {
+  const transporter = getTransporter();
+  await transporter.sendMail({
+    from: process.env.FROM_EMAIL,
+    replyTo: process.env.REPLY_TO || undefined,
+    to: email,
+    subject: `You've been unsubscribed from ${BLOG_NAME}`,
+    text: [
+      "You've been unsubscribed and won't receive any more emails.",
+      "",
+      `If this was a mistake, you can re-subscribe at ${BLOG_URL}`,
+    ].join("\n"),
+  });
 }
 
 exports.handler = async (event) => {
@@ -36,6 +51,11 @@ exports.handler = async (event) => {
       const result = await doUnsubscribe(token.trim());
       if (!result.found) {
         return html("<p>This unsubscribe link is not valid or you are already unsubscribed.</p>");
+      }
+      try {
+        await sendUnsubscribeConfirmation(result.email);
+      } catch {
+        // Don't fail the unsubscribe if the confirmation email fails
       }
       return html(
         `<p>You've been unsubscribed. You won't receive any more emails.</p>` +

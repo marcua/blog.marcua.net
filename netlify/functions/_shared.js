@@ -1,4 +1,5 @@
 const { AybClient } = require("@aybdb/client");
+const nodemailer = require("nodemailer");
 
 const BLOG_URL = process.env.BLOG_URL || "";
 const BLOG_NAME = process.env.BLOG_NAME || "";
@@ -10,6 +11,19 @@ function getAybClient() {
   return db;
 }
 
+function getTransporter() {
+  const port = parseInt(process.env.SMTP_PORT || "587", 10);
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465,
+    auth: {
+      user: process.env.SMTP_USERNAME,
+      pass: process.env.SMTP_PASSWORD,
+    },
+  });
+}
+
 function html(body) {
   return {
     statusCode: 200,
@@ -18,4 +32,4 @@ function html(body) {
   };
 }
 
-module.exports = { AybClient, BLOG_URL, BLOG_NAME, getAybClient, html };
+module.exports = { AybClient, BLOG_URL, BLOG_NAME, getAybClient, getTransporter, html };
