@@ -1,6 +1,6 @@
 const { AybClient } = require("@aybdb/client");
 const crypto = require("crypto");
-const { BLOG_NAME, getAybClient, getTransporter } = require("./_shared");
+const { BLOG_NAME, BLOG_URL, getAybClient, getTransporter } = require("./_shared");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -74,8 +74,7 @@ exports.handler = async (event) => {
       );
     }
 
-    const blogUrl = process.env.BLOG_URL || "";
-    const confirmUrl = `${blogUrl}/newsletter/confirm?token=${encodeURIComponent(token)}`;
+    const confirmUrl = `${BLOG_URL}/newsletter/confirm?token=${encodeURIComponent(token)}`;
 
     const transporter = getTransporter();
     await transporter.sendMail({
