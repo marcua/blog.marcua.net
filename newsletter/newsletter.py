@@ -114,6 +114,42 @@ def _normalize_text(value):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", value)).strip().lower()
 
 
+def _absolutify_urls(html, base_url):
+    """Rewrite relative src= and href= attributes to absolute URLs."""
+    def _rewrite(match):
+        attr = match.group(1)
+        quote = match.group(2)
+        url = match.group(3)
+        if url.startswith(("http://", "https://", "mailto:", "data:")):
+            return match.group(0)
+        absolute = base_url.rstrip("/") + "/" + url.lstrip("/")
+        return f'{attr}={quote}{absolute}{quote}'
+    return re.sub(r'(src|href|poster)=(["\'])(/[^"\']*)', _rewrite, html)
+
+
+def _replace_videos(html, post_url):
+    """Replace <video> tags with a linked poster image or a text link."""
+    def _replace(match):
+        tag = match.group(0)
+        poster_match = re.search(r'poster=["\']([^"\']+)["\']', tag)
+        if poster_match:
+            poster = poster_match.group(1)
+            return (
+                f'<a href="{post_url}" style="display:block;text-align:center;">'
+                f'<img src="{poster}" alt="Video thumbnail — click to watch" '
+                f'style="max-width:100%;border-radius:4px;" />'
+                f'</a>'
+            )
+        return f'<p><a href="{post_url}">▶ Watch video on blog</a></p>'
+    return re.sub(r"<video[^>]*>[\s\S]*?</video>", _replace, html, flags=re.IGNORECASE)
+
+
+def _prepare_html_for_email(html, post_url, base_url):
+    html = _absolutify_urls(html, base_url)
+    html = _replace_videos(html, post_url)
+    return html
+
+
 def build_html_email(title, url, summary, html_content):
     subtitle_html = ""
     if summary:
@@ -122,6 +158,7 @@ def build_html_email(title, url, summary, html_content):
         prefix_len = min(len(summary_norm), 60)
         if summary_norm and summary_norm[:prefix_len] != content_norm[:prefix_len]:
             subtitle_html = f'<p style="color:#555;font-style:italic;">{summary}</p>\n'
+    body = _prepare_html_for_email(html_content, url, BLOG_URL)
     footer = (
         f'<hr style="margin-top:2em;border:none;border-top:1px solid #ccc;">'
         f'<p style="font-size:0.9em;color:#666;">'
@@ -132,7 +169,7 @@ def build_html_email(title, url, summary, html_content):
     return (
         f"<h1>{title}</h1>\n"
         f"{subtitle_html}"
-        f"{html_content}\n"
+        f"{body}\n"
         f'<p><a href="{url}">View on blog</a></p>\n'
         f"{footer}"
     )
