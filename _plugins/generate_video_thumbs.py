@@ -18,31 +18,11 @@ THUMB_DIR = REPO_ROOT / "assets" / "images" / "video-thumbs"
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov"}
 
 
-def get_duration(video_path):
-    """Get video duration in seconds via ffprobe."""
-    result = subprocess.run(
-        [
-            "ffprobe", "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1",
-            str(video_path),
-        ],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0 or not result.stdout.strip():
-        return None
-    return float(result.stdout.strip())
-
-
 def generate_thumbnail(video_path, thumb_path):
     thumb_path.parent.mkdir(parents=True, exist_ok=True)
-    duration = get_duration(video_path)
-    seek_args = ["-ss", str(duration / 2)] if duration else []
     result = subprocess.run(
         [
             "ffmpeg", "-y",
-            *seek_args,
             "-i", str(video_path),
             "-frames:v", "1",
             "-f", "image2",
