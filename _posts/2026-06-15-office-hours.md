@@ -28,4 +28,4 @@ These office hours are for people who are early on in their journey in our indus
 
 Finally: this is an experiment that I hope to learn from. If you have feedback on how I can run things better or differently, please [reach out](mailto:marcua@marcua.net)!
 
-*Thank you to Josh Blum, Meredith Blumenstock, Daniel Haas, and Eugene Wu for feedback on this idea.*
+*Thank you to Nitesh Banta, Josh Blum, Meredith Blumenstock, Daniel Haas, and Eugene Wu for feedback on this idea.*
