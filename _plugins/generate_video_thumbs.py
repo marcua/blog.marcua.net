@@ -25,7 +25,8 @@ def generate_thumbnail(video_path, thumb_path):
             "ffmpeg", "-y",
             "-i", str(video_path),
             "-frames:v", "1",
-            "-f", "image2",
+            "-vf", "scale=1280:-1",
+            "-q:v", "2",
             str(thumb_path),
         ],
         capture_output=True,
@@ -54,7 +55,7 @@ def main():
     skipped = 0
     for video in sorted(videos):
         rel = video.relative_to(VIDEO_DIR)
-        thumb = THUMB_DIR / rel.with_suffix(".png")
+        thumb = THUMB_DIR / rel.with_suffix(".jpg")
         if thumb.exists():
             skipped += 1
             continue

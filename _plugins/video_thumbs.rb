@@ -31,7 +31,7 @@ Jekyll::Hooks.register :posts, :post_render do |post|
     next match unless source_match
 
     video_rel = source_match[2]
-    thumb_rel = video_rel.sub(/\.[^.]+$/, '.png')
+    thumb_rel = video_rel.sub(/\.[^.]+$/, '.jpg')
     thumb_path = File.join(post.site.source, "assets", "images", "video-thumbs", thumb_rel)
 
     if File.exist?(thumb_path)
