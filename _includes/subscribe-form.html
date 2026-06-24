@@ -1,0 +1,49 @@
+<div id="newsletter-subscribe" style="margin: 2em 0; padding: 1em 0; border-top: 1px solid #ddd;">
+  <p><strong>Get new posts by email</strong></p>
+  <form id="subscribe-form" style="display: flex; gap: 0.5em; flex-wrap: wrap; align-items: center;">
+    <input
+      type="email"
+      name="email"
+      placeholder="you@example.com"
+      required
+      style="padding: 0.4em 0.6em; font-size: 1em; border: 1px solid #ccc; border-radius: 3px; flex: 1; min-width: 200px;"
+    />
+    <button type="submit" style="padding: 0.4em 1em; font-size: 1em; cursor: pointer;">Subscribe</button>
+  </form>
+  <p id="subscribe-msg" style="margin-top: 0.5em; display: none;"></p>
+</div>
+<script>
+(function () {
+  var form = document.getElementById("subscribe-form");
+  var msg = document.getElementById("subscribe-msg");
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    msg.style.display = "none";
+    var email = form.email.value;
+    fetch("/newsletter/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.ok) {
+          msg.textContent = data.already
+            ? "You're already subscribed!"
+            : "Check your email to confirm your subscription.";
+          msg.style.color = "green";
+          form.reset();
+        } else {
+          msg.textContent = data.error || "Something went wrong, please try again.";
+          msg.style.color = "red";
+        }
+        msg.style.display = "block";
+      })
+      .catch(function () {
+        msg.textContent = "Something went wrong, please try again.";
+        msg.style.color = "red";
+        msg.style.display = "block";
+      });
+  });
+})();
+</script>

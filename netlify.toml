@@ -8,3 +8,21 @@
 [build.environment]
   RUBY_VERSION = "3.4.9"
   JEKYLL_ENV = "production"
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/newsletter/subscribe"
+  to = "/.netlify/functions/subscribe"
+  status = 200
+
+[[redirects]]
+  from = "/newsletter/confirm"
+  to = "/.netlify/functions/confirm"
+  status = 200
+
+[[redirects]]
+  from = "/newsletter/unsubscribe"
+  to = "/.netlify/functions/unsubscribe"
+  status = 200
