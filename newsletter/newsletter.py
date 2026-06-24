@@ -144,9 +144,20 @@ def _replace_videos(html, post_url):
     return re.sub(r"<video[^>]*>[\s\S]*?</video>", _replace, html, flags=re.IGNORECASE)
 
 
+def _constrain_images(html):
+    """Add max-width:100% to all <img> tags so they don't overflow in email."""
+    return re.sub(
+        r"<img(?![^>]*max-width)",
+        '<img style="max-width:100%;height:auto;"',
+        html,
+        flags=re.IGNORECASE,
+    )
+
+
 def _prepare_html_for_email(html, post_url, base_url):
     html = _absolutify_urls(html, base_url)
     html = _replace_videos(html, post_url)
+    html = _constrain_images(html)
     return html
 
 
@@ -158,6 +169,7 @@ def build_html_email(title, url, summary, html_content):
         prefix_len = min(len(summary_norm), 60)
         if summary_norm and summary_norm[:prefix_len] != content_norm[:prefix_len]:
             subtitle_html = f'<p style="color:#555;font-style:italic;">{summary}</p>\n'
+    view_link = f'<p><a href="{url}">View on blog</a></p>\n'
     body = _prepare_html_for_email(html_content, url, BLOG_URL)
     footer = (
         f'<hr style="margin-top:2em;border:none;border-top:1px solid #ccc;">'
@@ -169,8 +181,8 @@ def build_html_email(title, url, summary, html_content):
     return (
         f"<h1>{title}</h1>\n"
         f"{subtitle_html}"
+        f"{view_link}"
         f"{body}\n"
-        f'<p><a href="{url}">View on blog</a></p>\n'
         f"{footer}"
     )
 
