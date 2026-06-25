@@ -124,7 +124,7 @@ def _absolutify_urls(html, base_url):
             return match.group(0)
         absolute = base_url.rstrip("/") + "/" + url.lstrip("/")
         return f'{attr}={quote}{absolute}{quote}'
-    return re.sub(r'(src|href|poster)=(["\'])(/[^"\']*)', _rewrite, html)
+    return re.sub(r'(src|href)=(["\'])(/[^"\']*)', _rewrite, html)
 
 
 def _infer_poster(video_tag):
@@ -143,16 +143,9 @@ def _infer_poster(video_tag):
 def _replace_videos(html, post_url, base_url):
     """Replace <video> tags with a linked poster image or a text link."""
     def _replace(match):
-        tag = match.group(0)
-        poster_match = re.search(r'poster=["\']([^"\']+)["\']', tag)
-        if poster_match:
-            poster = poster_match.group(1)
-        else:
-            poster = _infer_poster(tag)
+        poster = _infer_poster(match.group(0))
         if poster:
-            abs_poster = poster
-            if not poster.startswith(("http://", "https://")):
-                abs_poster = base_url.rstrip("/") + "/" + poster.lstrip("/")
+            abs_poster = base_url.rstrip("/") + "/" + poster.lstrip("/")
             return (
                 f'<a href="{post_url}" style="display:block;text-align:center;">'
                 f'<img src="{abs_poster}" alt="Video thumbnail — click to watch" '
