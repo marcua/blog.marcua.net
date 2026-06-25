@@ -124,20 +124,32 @@ def _absolutify_urls(html, base_url):
             return match.group(0)
         absolute = base_url.rstrip("/") + "/" + url.lstrip("/")
         return f'{attr}={quote}{absolute}{quote}'
-    return re.sub(r'(src|href|poster)=(["\'])(/[^"\']*)', _rewrite, html)
+    return re.sub(r'(src|href)=(["\'])(/[^"\']*)', _rewrite, html)
 
 
-def _replace_videos(html, post_url):
+def _infer_poster(video_tag):
+    """Check if a thumbnail exists for this video's source path."""
+    source_match = re.search(
+        r'<source[^>]+src=["\'](?:https?://[^/]+)?/assets/video/([^"\']+)["\']',
+        video_tag, re.IGNORECASE,
+    )
+    if not source_match:
+        return None
+    video_rel = source_match.group(1)
+    thumb_rel = re.sub(r"\.[^.]+$", ".jpg", video_rel)
+    return f"/assets/images/video-thumbs/{thumb_rel}"
+
+
+def _replace_videos(html, post_url, base_url):
     """Replace <video> tags with a linked poster image or a text link."""
     def _replace(match):
-        tag = match.group(0)
-        poster_match = re.search(r'poster=["\']([^"\']+)["\']', tag)
-        if poster_match:
-            poster = poster_match.group(1)
+        poster = _infer_poster(match.group(0))
+        if poster:
+            abs_poster = base_url.rstrip("/") + "/" + poster.lstrip("/")
             return (
                 f'<a href="{post_url}" style="display:block;text-align:center;">'
-                f'<img src="{poster}" alt="Video thumbnail — click to watch" '
-                f'style="max-width:100%;border-radius:4px;" />'
+                f'<img src="{abs_poster}" alt="Video thumbnail — click to watch" '
+                f'style="max-width:100%;height:auto;border-radius:4px;" />'
                 f'</a>'
             )
         return f'<p><a href="{post_url}">▶ Watch video on blog</a></p>'
@@ -156,7 +168,7 @@ def _constrain_images(html):
 
 def _prepare_html_for_email(html, post_url, base_url):
     html = _absolutify_urls(html, base_url)
-    html = _replace_videos(html, post_url)
+    html = _replace_videos(html, post_url, base_url)
     html = _constrain_images(html)
     return html
 
