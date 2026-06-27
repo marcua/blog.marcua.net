@@ -16,7 +16,7 @@
           labeled form below the content.
         {%- endcomment -%}
         {%- if page.layout == 'home' -%}
-          {%- include subscribe-inline.html -%}
+          <div class="newsletter-home">{%- include subscribe-inline.html -%}</div>
           {{ content }}
         {%- else -%}
           {{ content }}

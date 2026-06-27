@@ -131,6 +131,19 @@ strong, b {
   p {
     margin-bottom: 1.5em;
   }
+
+  // Keep media and wide tables from overflowing the column (notably the
+  // fixed-width <video> demos, which otherwise blow past the mobile viewport).
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
 
 // Newsletter subscribe forms
@@ -177,6 +190,17 @@ strong, b {
     text-align: center;
     margin-top: 0.5em;
     font-size: 0.9em;
+  }
+}
+
+// On the listing/home page the page is left-aligned, so left-align the form
+// (instead of centering it) to keep it on the same vertical axis as the
+// masthead and post list, and tighten the spacing so it doesn't float.
+.newsletter-home .newsletter-inline {
+  margin: 1.25em 0 2.5em 0;
+
+  .subscribe-msg {
+    text-align: left;
   }
 }
 
