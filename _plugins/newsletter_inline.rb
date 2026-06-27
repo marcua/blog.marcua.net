@@ -1,4 +1,4 @@
-# Inject the inline newsletter subscribe form after the 2nd paragraph
+# Inject the inline newsletter subscribe form after the 4th paragraph
 # of each post. Only applies to the post layout, not pages/archives.
 
 Jekyll::Hooks.register :posts, :post_render do |post|
@@ -12,7 +12,7 @@ Jekyll::Hooks.register :posts, :post_render do |post|
 
   post.output = post.output.gsub(%r{</p>}i) do |match|
     para_count += 1
-    if para_count == 2
+    if para_count == 4
       "#{match}\n#{form_html}"
     else
       match
