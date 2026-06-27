@@ -5,7 +5,7 @@
 # because the body contains nested divs (code blocks, tables) that would
 # break a naive open/close regex.
 
-PARAGRAPH_INDEX = 4
+PARAGRAPH_INDEX = 2
 
 Jekyll::Hooks.register :posts, :post_render do |post|
   next unless post.output
