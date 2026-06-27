@@ -9,8 +9,18 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        {{ content }}
-        {%- include subscribe-form.html -%}
+        {%- comment -%}
+          On the listing/home page the subscribe form goes at the top
+          (highest-intent spot for a browsing visitor); on every other
+          page it stays below the content.
+        {%- endcomment -%}
+        {%- if page.layout == 'home' -%}
+          {%- include subscribe-form.html -%}
+          {{ content }}
+        {%- else -%}
+          {{ content }}
+          {%- include subscribe-form.html -%}
+        {%- endif -%}
       </div>
     </main>
 
