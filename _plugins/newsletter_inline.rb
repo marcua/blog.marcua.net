@@ -10,7 +10,7 @@
 # footer / end-of-post form paragraphs aren't included.
 
 PARAGRAPH_INDEX = 2   # inject after this body paragraph
-MIN_PARAGRAPHS = 8    # ...only if the post body has at least this many
+MIN_PARAGRAPHS = 5    # ...only if the post body has at least this many
 
 Jekyll::Hooks.register :posts, :post_render do |post|
   next unless post.output
