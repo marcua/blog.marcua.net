@@ -11,16 +11,18 @@
       <div class="wrapper">
         {%- comment -%}
           On the listing/home page the subscribe form goes at the top
-          (highest-intent spot for a browsing visitor); on every other
-          page it stays below the content.
+          (highest-intent spot for a browsing visitor) and uses the
+          unlabeled centered variant; every other page keeps the
+          labeled form below the content.
         {%- endcomment -%}
         {%- if page.layout == 'home' -%}
-          {%- include subscribe-form.html context="home" -%}
+          {%- include subscribe-inline.html -%}
           {{ content }}
         {%- else -%}
           {{ content }}
           {%- include subscribe-form.html -%}
         {%- endif -%}
+        {%- include subscribe-script.html -%}
       </div>
     </main>
 

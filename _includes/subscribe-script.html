@@ -1,0 +1,36 @@
+<script>
+(function () {
+  document.querySelectorAll(".subscribe-form").forEach(function (form) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var msg = form.parentElement.querySelector(".subscribe-msg");
+      msg.style.display = "none";
+      var email = form.email.value;
+      fetch("/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.ok) {
+            msg.textContent = data.already
+              ? "You're already subscribed!"
+              : "Check your email to confirm your subscription.";
+            msg.style.color = "#4ade80";
+            form.reset();
+          } else {
+            msg.textContent = data.error || "Something went wrong, please try again.";
+            msg.style.color = "#f87171";
+          }
+          msg.style.display = "block";
+        })
+        .catch(function () {
+          msg.textContent = "Something went wrong, please try again.";
+          msg.style.color = "#f87171";
+          msg.style.display = "block";
+        });
+    });
+  });
+})();
+</script>
