@@ -15,7 +15,7 @@
           page it stays below the content.
         {%- endcomment -%}
         {%- if page.layout == 'home' -%}
-          {%- include subscribe-form.html -%}
+          {%- include subscribe-form.html context="home" -%}
           {{ content }}
         {%- else -%}
           {{ content }}

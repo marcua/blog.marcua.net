@@ -230,3 +230,11 @@ strong, b {
     font-size: 0.9em;
   }
 }
+
+// At the top of the listing page there's no content above to divide from,
+// so drop the top border and sit cleanly under the masthead.
+.newsletter-home {
+  border-top: none;
+  padding-top: 0;
+  margin: 0 0 2.5em 0;
+}
