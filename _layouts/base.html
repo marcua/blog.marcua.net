@@ -9,8 +9,20 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        {{ content }}
-        {%- include subscribe-form.html -%}
+        {%- comment -%}
+          On the listing/home page the subscribe form goes at the top
+          (highest-intent spot for a browsing visitor) and uses the
+          unlabeled centered variant; every other page keeps the
+          labeled form below the content.
+        {%- endcomment -%}
+        {%- if page.layout == 'home' -%}
+          <div class="newsletter-home">{%- include subscribe-inline.html -%}</div>
+          {{ content }}
+        {%- else -%}
+          {{ content }}
+          {%- include subscribe-form.html -%}
+        {%- endif -%}
+        {%- include subscribe-script.html -%}
       </div>
     </main>
 

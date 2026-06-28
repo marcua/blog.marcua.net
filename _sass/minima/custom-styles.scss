@@ -131,4 +131,126 @@ strong, b {
   p {
     margin-bottom: 1.5em;
   }
+
+  // Keep media and wide tables from overflowing the column (notably the
+  // fixed-width <video> demos, which otherwise blow past the mobile viewport).
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+// Newsletter subscribe forms
+// Inline (mid-post): Platformer-style centered input+button row
+.newsletter-inline {
+  max-width: 480px;
+  margin: 2em auto;
+
+  form {
+    display: flex;
+    border: 1px solid #555;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  input[type="email"] {
+    flex: 1;
+    padding: 0.7em 1em;
+    font-size: 0.95em;
+    font-family: $base-font-family;
+    border: none;
+    outline: none;
+    background: #2a2a2a;
+    color: $text-color;
+    min-width: 0;
+
+    &::placeholder {
+      color: #888;
+    }
+  }
+
+  button {
+    padding: 0.7em 1.5em;
+    font-size: 0.95em;
+    font-weight: 600;
+    font-family: $base-font-family;
+    cursor: pointer;
+    border: none;
+    background: $link-base-color;
+    color: #fff;
+  }
+
+  .subscribe-msg {
+    text-align: center;
+    margin-top: 0.5em;
+    font-size: 0.9em;
+  }
+}
+
+// On the listing/home page the page is left-aligned, so left-align the form
+// (instead of centering it) to keep it on the same vertical axis as the
+// masthead and post list, and tighten the spacing so it doesn't float.
+.newsletter-home .newsletter-inline {
+  margin: 1.25em 0 2.5em 0;
+
+  .subscribe-msg {
+    text-align: left;
+  }
+}
+
+// End-of-post: same joined input+button as the inline form, but with a label.
+.newsletter-end {
+  border-top: 1px solid #555;
+  padding: 1.5em 0;
+  margin: 2em 0 0 0;
+
+  p {
+    margin: 0 0 0.5em 0;
+  }
+
+  form {
+    display: flex;
+    max-width: 480px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  input[type="email"] {
+    flex: 1;
+    padding: 0.7em 1em;
+    font-size: 0.95em;
+    font-family: $base-font-family;
+    border: none;
+    outline: none;
+    background: #2a2a2a;
+    color: $text-color;
+    min-width: 0;
+
+    &::placeholder {
+      color: #888;
+    }
+  }
+
+  button {
+    padding: 0.7em 1.5em;
+    font-size: 0.95em;
+    font-weight: 600;
+    font-family: $base-font-family;
+    cursor: pointer;
+    border: none;
+    background: $link-base-color;
+    color: #fff;
+  }
+
+  .subscribe-msg {
+    margin-top: 0.5em;
+    font-size: 0.9em;
+  }
 }
