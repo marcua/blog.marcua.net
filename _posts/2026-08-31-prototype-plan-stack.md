@@ -41,6 +41,8 @@ Here's a real example from a feature we shipped to allow users to schedule B12 a
 * **PR 4** — Frontend scaffolding: route table, redux slice, generic page wrapper. Gate: the route registers with `visible: () => false`, so the page is inaccessible.
 * **PR 5** — The scheduling UI itself: the list page and the in-chat scheduling form. Gate: still no nav entry and no menu item, so users can't navigate to these pages.
 * **PR 6** — Surface the scheduling feature in various menus. Gate: with this PR the feature is live.
+
+*AI disclosure: I asked an agent to summarize the markdown plan's PR descriptions and gating details and then edited them.*
 {% endexample %}
 
 We've got an agent skill that guides the agent through proposing a stack and gate using B12y mechanisms for experiments and feature flags, but agents seem to be pretty good at doing this without too much direction. When the engineer and agent agree on the right list of stacked PRs and feature gate, the agent writes the plan to a markdown file inside the prototype branch, and the engineer may get feedback on the big-picture plan from peers.
@@ -52,6 +54,8 @@ One interesting thing that happens as you review the PRs: the stack changes. I f
 * As we reviewed the command in PR3, we realized a field in the schema was poorly named and we lacked some fields to track errors. We inserted those and some management command updates in a PR that followed PR3.
 * As we played with the experience, we realized we weren't modeling timezones properly, so we inserted proper timezone handling before the gate flip PR.
 * As we got some design/product review feedback in the final stages before launch, we added a bunch of polish, flow, and consistency improvements. As a result, our UI PR came in at ~1200 lines against a ~500-line target.
+
+*AI disclosure: I asked an agent to summarize the updates to the original markdown plan and then filtered/edited them for ease of consumption.*
 {% endexample %}
 
 So we shipped the scheduling feature in a few more PRs than the original 6. There were also a few follow-on PRs after making the feature user-visible, like data model cleanups and better handling of concurrent scheduling runs.
