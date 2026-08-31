@@ -254,3 +254,63 @@ strong, b {
     font-size: 0.9em;
   }
 }
+// Worked-example asides ({% example Title %} ... {% endexample %}).
+// These carry supporting detail that a reader can take or leave, so they're
+// set apart from the argument: a boxed, slightly recessed panel with a size
+// step down and dimmer body text, letting the eye route around them without
+// losing the thread of the post.
+.post-content .example-block {
+  margin: 2em 0;
+  padding: 1.1em 1.35em;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 4px;
+  font-size: 0.94em;
+  line-height: 1.55;
+  color: #b6b6b6;
+
+  // The title sets in the body sans: these run long, and mono's full-width
+  // spaces make a descriptive phrase read slowly at this size.
+  .example-block-label {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #e6e6e6;
+    margin-bottom: 0.85em;
+  }
+
+  // "Example:" is a quiet mono kicker; the title after it carries the weight.
+  // Stepped down a notch because mono reads optically larger than sans at the
+  // same size.
+  .example-block-kicker {
+    font-family: $heading-font-family;
+    font-weight: 500;
+    font-size: 0.88em;
+    color: #8f8f8f;
+    letter-spacing: 0.03em;
+  }
+
+  // Tighter rhythm than body copy: these are scannable lists, not prose.
+  p, ul, ol {
+    margin-bottom: 0.9em;
+  }
+
+  li {
+    margin-bottom: 0.4em;
+  }
+
+  // Dim the markers so the left edge of the list stays quiet and the bolded
+  // terms are what the eye catches.
+  li::marker {
+    color: #777;
+  }
+
+  // The site-wide pure-white bold is too hard a step against this panel's
+  // dimmer text; back it off to the label color.
+  strong, b {
+    color: #e6e6e6;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
