@@ -40,6 +40,11 @@ layout: base
     {{ content }}
   </div>
 
+  {%- assign ai_post = site.posts | where_exp: "p", "p.path contains 'ai-disclosure'" | first -%}
+  {%- if ai_post and ai_post.url != page.url -%}
+    <p class="post-ai-note">I write each post myself. Here's <a href="{{ ai_post.url | relative_url }}">how I use AI in my writing process</a>.</p>
+  {%- endif -%}
+
   {%- if site.disqus.shortname -%}
     {%- include disqus_comments.html -%}
   {%- endif -%}

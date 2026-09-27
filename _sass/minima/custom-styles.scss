@@ -314,3 +314,22 @@ strong, b {
     margin-bottom: 0;
   }
 }
+
+// Per-post link to the AI-on-this-blog policy. It sits below the divider, at
+// the top of the end-of-post section, so it reads as site-level framing
+// (alongside the subscribe form) rather than as the post's last line.
+.post-ai-note {
+  border-top: 1px solid #555;
+  padding-top: 1.5em;
+  margin: 2em 0 0 0;
+  font-size: 0.9rem;
+  color: #c8c8c8;
+}
+
+// The note now carries the divider, so the subscribe block that follows the
+// article drops its own border and top spacing to join the same section.
+.post:has(.post-ai-note) + .newsletter-end {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 1.5em;
+}
